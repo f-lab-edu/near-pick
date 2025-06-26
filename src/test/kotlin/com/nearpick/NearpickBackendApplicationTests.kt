@@ -9,5 +9,4 @@ class NearpickBackendApplicationTests {
     @Test
     fun contextLoads() {
     }
-
 }
