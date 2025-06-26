@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: nearpick-backend
+  profiles:
+    active: local
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.nearpick: DEBUG
