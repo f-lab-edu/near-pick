@@ -3,6 +3,7 @@ package com.nearpick.domain.user.service
 import com.nearpick.domain.user.dto.UserResponse
 import com.nearpick.domain.user.dto.UserSaveRequest
 import com.nearpick.domain.user.dto.UserUpdateRequest
+import com.nearpick.domain.user.exception.EmailAlreadyExistsException
 import com.nearpick.domain.user.exception.UserNotFoundException
 import com.nearpick.domain.user.mapper.toEntity
 import com.nearpick.domain.user.mapper.toResponse
@@ -17,8 +18,11 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ) {
     fun createUser(request: UserSaveRequest): UserResponse {
-        val encryptedPassword = passwordEncoder.encode(request.password)
+        if (userRepository.existsByEmail(request.email)) {
+            throw EmailAlreadyExistsException(request.email)
+        }
 
+        val encryptedPassword = passwordEncoder.encode(request.password)
         val user = request.toEntity(encryptedPassword)
 
         return userRepository.save(user).toResponse()
