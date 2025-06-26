@@ -12,6 +12,16 @@ server:
         min-spare: 10    # 최소 유휴 스레드 수
 
 
+springdoc:
+    api-docs:
+        path: /v3/api-docs
+    swagger-ui:
+        path: /swagger-ui.html
+        display-request-duration: true
+        doc-expansion: none
+        operations-sorter: method
+        tags-sorter: alpha
+
 logging:
   level:
     root: INFO
