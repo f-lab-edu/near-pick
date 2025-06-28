@@ -22,6 +22,16 @@ springdoc:
         operations-sorter: method
         tags-sorter: alpha
 
+springdoc:
+    api-docs:
+        path: /v3/api-docs
+    swagger-ui:
+        path: /swagger-ui.html
+        display-request-duration: true
+        doc-expansion: none
+        operations-sorter: method
+        tags-sorter: alpha
+
 logging:
   level:
     root: INFO
