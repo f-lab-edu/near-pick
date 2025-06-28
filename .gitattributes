@@ -1,0 +1,25 @@
+# --- Kotlin/Java 소스코드 줄바꿈 통일 ---
+*.kt text eol=lf
+*.kts text eol=lf
+*.java text eol=lf
+
+# --- 설정 파일들 줄바꿈 통일 ---
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.properties text eol=lf
+*.md text eol=lf
+*.editorconfig text eol=lf
+
+# --- 실행 스크립트 줄바꿈 설정 ---
+/gradlew text eol=lf
+*.bat text eol=crlf
+
+# --- 바이너리 파일 처리 ---
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
