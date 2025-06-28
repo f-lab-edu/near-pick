@@ -6,8 +6,12 @@ spring:
 
 server:
   port: 8080
+  tomcat:
+    threads:
+        max: 200         # 최대 스레드 수
+        min-spare: 10    # 최소 유휴 스레드 수
+
 
 logging:
   level:
     root: INFO
-    com.nearpick: DEBUG

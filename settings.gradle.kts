@@ -1,1 +1,1 @@
-rootProject.name = "nearpick-backend"
+rootProject.name = "nearpick-api"
