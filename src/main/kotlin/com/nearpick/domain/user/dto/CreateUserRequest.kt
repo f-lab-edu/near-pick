@@ -1,6 +1,6 @@
 package com.nearpick.domain.user.dto
 
-data class UserSaveRequest(
+data class CreateUserRequest(
     val email: String,
     val nickname: String,
     val password: String,
