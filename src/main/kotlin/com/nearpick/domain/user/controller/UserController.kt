@@ -1,13 +1,16 @@
 package com.nearpick.domain.user.controller
 
 import com.nearpick.common.response.Response
+import com.nearpick.domain.auth.dto.UserPrincipal
 import com.nearpick.domain.user.dto.CreateUserRequest
 import com.nearpick.domain.user.dto.UpdateUserRequest
 import com.nearpick.domain.user.dto.UserResponse
+import com.nearpick.domain.user.mapper.toResponse
 import com.nearpick.domain.user.service.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -55,5 +58,14 @@ class UserController(
     fun deleteUser(@PathVariable id: String): ResponseEntity<Response<String>> {
         userService.deleteUser(id)
         return ResponseEntity.ok(Response.success("success"))
+    }
+
+    @Operation(summary = "내 정보 조회", description = "내 정보를 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "내 정보 조회 성공")
+    @GetMapping("/me")
+    fun getMyInfo(
+        @AuthenticationPrincipal userPrincipal: UserPrincipal
+    ): ResponseEntity<Response<UserResponse>> {
+        return ResponseEntity.ok(Response.success(userPrincipal.getUser().toResponse()))
     }
 }
