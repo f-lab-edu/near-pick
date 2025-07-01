@@ -1,6 +1,8 @@
 package com.nearpick.domain.user.service
 
+import com.nearpick.common.constant.Role
 import com.nearpick.common.exception.EmailAlreadyExistsException
+import com.nearpick.common.exception.InvalidRoleException
 import com.nearpick.common.exception.UserNotFoundException
 import com.nearpick.domain.user.dto.CreateUserRequest
 import com.nearpick.domain.user.dto.UpdateUserRequest
@@ -22,8 +24,14 @@ class UserService(
             throw EmailAlreadyExistsException(request.email)
         }
 
+        val parsedRole = Role.from(request.role)
+        if (parsedRole == Role.ADMIN) {
+            throw InvalidRoleException("ADMIN은 직접 등록할 수 없습니다.")
+        }
+
         val encryptedPassword = passwordEncoder.encode(request.password)
-        val user = request.toEntity(encryptedPassword)
+
+        val user = request.toEntity(parsedRole, encryptedPassword)
 
         return userRepository.save(user).toResponse()
     }

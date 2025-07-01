@@ -16,12 +16,12 @@ fun User.toResponse(): UserResponse = UserResponse(
     isActive = this.isActive
 )
 
-fun CreateUserRequest.toEntity(encodedPassword: String): User = User(
+fun CreateUserRequest.toEntity(parsedRole: Role, encodedPassword: String): User = User(
     id = UUID.randomUUID().toString(),
     email = this.email,
     nickname = this.nickname,
     password = encodedPassword,
     profileImageUrl = this.profileImageUrl,
     phoneNumber = this.phoneNumber,
-    role = Role.USER
+    role = parsedRole
 )
