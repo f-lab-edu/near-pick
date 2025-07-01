@@ -22,7 +22,7 @@ class JwtAuthenticationEntryPoint(
 
         val errorResponse = Response.error(
             code = "UNAUTHORIZED",
-            message = "인증에 실패했습니다. 토큰을 다시 입력해주세요."
+            message = "인증에 실패했습니다. 다시 로그인해주세요."
         )
 
         response.writer.write(objectMapper.writeValueAsString(errorResponse))
