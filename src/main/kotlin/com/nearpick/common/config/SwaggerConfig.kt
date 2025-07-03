@@ -28,7 +28,7 @@ class SwaggerConfig {
             )
     }
 
-    fun createSecurityScheme(): SecurityScheme? {
+    fun createSecurityScheme(): SecurityScheme {
         return SecurityScheme()
             .type(SecurityScheme.Type.HTTP)
             .bearerFormat("JWT")

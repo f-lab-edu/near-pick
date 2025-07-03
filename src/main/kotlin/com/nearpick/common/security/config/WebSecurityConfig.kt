@@ -3,12 +3,12 @@ package com.nearpick.common.security.config
 import com.nearpick.common.security.JwtAccessDeniedHandler
 import com.nearpick.common.security.JwtAuthenticationEntryPoint
 import com.nearpick.common.security.JwtAuthenticationFilter
-import com.nearpick.common.security.constant.SecurityPermitUrls
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
@@ -25,12 +25,22 @@ class WebSecurityConfig(
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers(*SecurityPermitUrls.ALL_PUBLIC_URLS).permitAll()
-                    .requestMatchers(*SecurityPermitUrls.USER_URLS).hasRole("USER")
-                    .requestMatchers(*SecurityPermitUrls.SELLER_URLS).hasRole("SELLER")
-                    .requestMatchers(*SecurityPermitUrls.ADMIN_URLS).hasRole("ADMIN")
+                    // Swagger 관련
+                    .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    ).permitAll()
+                    // 인증 관련
+                    .requestMatchers(
+                        "/api/auth/login",
+                        "/api/auth/logout",
+                        "/api/auth/signup",
+                        "/api/users"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .exceptionHandling {
