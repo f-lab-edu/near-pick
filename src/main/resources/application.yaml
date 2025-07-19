@@ -1,17 +1,31 @@
 spring:
-  application:
-    name: nearpick-backend
-  profiles:
-    active: local
+    application:
+        name: nearpick-backend
+    profiles:
+        active: local
 
 server:
-  port: 8080
-  tomcat:
-    threads:
-        max: 200         # 최대 스레드 수
-        min-spare: 10    # 최소 유휴 스레드 수
+    port: 8080
+    tomcat:
+        threads:
+            max: 200         # 최대 스레드 수
+            min-spare: 10    # 최소 유휴 스레드 수
+    servlet:
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
 
+springdoc:
+    api-docs:
+        path: /v3/api-docs
+    swagger-ui:
+        path: /swagger-ui.html
+        display-request-duration: true
+        doc-expansion: none
+        operations-sorter: method
+        tags-sorter: alpha
 
 logging:
-  level:
-    root: INFO
+    level:
+        root: INFO
