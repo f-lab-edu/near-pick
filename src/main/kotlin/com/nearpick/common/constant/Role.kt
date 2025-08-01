@@ -7,7 +7,7 @@ enum class Role {
 
     companion object {
         fun from(value: String?): Role {
-            val upper = value?.uppercase() ?: USER.name
+            val upper = value?.uppercase() ?: throw InvalidRoleException(value)
 
             if (upper == ADMIN.name) throw InvalidRoleException(value)
 
