@@ -1,6 +1,6 @@
 package com.nearpick.domain.address.dto
 
-class SearchAddressResponse(
+data class SearchAddressResponse(
     val fullAddress: String?,
 
     val province: String?,

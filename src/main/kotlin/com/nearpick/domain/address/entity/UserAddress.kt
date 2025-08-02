@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = "UserAddress")
+@Table(name = "user_address")
 @EntityListeners(AuditingEntityListener::class)
 class UserAddress(
     @Id
@@ -23,13 +23,13 @@ class UserAddress(
     @Column(nullable = false)
     val userId: String,
 
-    val name: String?,
-    val receiverName: String?,
-    val phoneNumber: String?,
+    var name: String?,
+    var receiverName: String?,
+    var phoneNumber: String?,
 
     @Column(nullable = false)
     val fullAddress: String,
-    val addressDetail: String?,
+    var addressDetail: String?,
 
     val province: String?,
     val district: String?,
@@ -37,7 +37,7 @@ class UserAddress(
     val street: String?,
     val buildingNumber: String?,
 
-    val isDefault: Boolean? = false,
+    var isDefault: Boolean? = false,
 
     @CreatedDate
     val createdAt: LocalDateTime? = null,

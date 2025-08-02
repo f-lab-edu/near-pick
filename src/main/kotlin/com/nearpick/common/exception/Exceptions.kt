@@ -33,3 +33,10 @@ class InvalidPasswordException() : BaseException(
     message = "비밀번호가 일치하지 않습니다.",
     status = HttpStatus.UNAUTHORIZED
 )
+
+// 사용자 배송지 관련 예외
+class UserAddressNotFoundException(addressId: String, userId: String) : BaseException(
+    code = "USER_ADDRESS_NOT_FOUN지",
+    message = "해당 배송를 찾을 수 없습니다. (userId=$userId, addressId=$addressId)",
+    status = HttpStatus.NOT_FOUND
+)

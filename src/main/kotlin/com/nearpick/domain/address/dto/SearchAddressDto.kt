@@ -1,6 +1,6 @@
 package com.nearpick.domain.address.dto
 
-class SearchAddressDto(
+data class SearchAddressDto(
     val documents: List<Document>
 ) {
     data class Document(

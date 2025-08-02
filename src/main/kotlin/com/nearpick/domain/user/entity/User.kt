@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 @EntityListeners(AuditingEntityListener::class)
 class User(
     @Id
