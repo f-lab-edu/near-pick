@@ -1,6 +1,6 @@
 package com.nearpick.domain.address.client
 
-import com.nearpick.domain.address.dto.SearchAddressResponse
+import com.nearpick.domain.address.dto.SearchAddressDto
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -12,13 +12,13 @@ class KakaoAddressClient(
 ) {
     private val kakaoBaseUrl = "https://dapi.kakao.com"
 
-    fun searchAddress(query: String): List<SearchAddressResponse.Document> {
+    fun searchAddress(query: String): List<SearchAddressDto.Document> {
         return webClientBuilder.build()
             .get()
             .uri("$kakaoBaseUrl/v2/local/search/address.json?query={query}", query)
             .header("Authorization", "KakaoAK $kakaoApiKey")
             .retrieve()
-            .bodyToMono(SearchAddressResponse::class.java)
+            .bodyToMono(SearchAddressDto::class.java)
             .block()
             ?.documents ?: emptyList()
     }

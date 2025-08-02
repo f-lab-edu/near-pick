@@ -36,8 +36,6 @@ class User(
 
     var phoneNumber: String? = null,
 
-    var locationId: String? = null,
-
     var accountHolderName: String? = null,
 
     var bankName: String? = null,
