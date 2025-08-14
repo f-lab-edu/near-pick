@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service
 class AddressSearchService(
     private val kakaoAddressClient: KakaoAddressClient
 ) {
-    fun searchAddress(query: String): List<SearchAddressResponse> {
+    fun searchAddress(query: String): List<SearchAddressResponse>? {
         val kakaoResults = kakaoAddressClient.searchAddress(query)
-        return kakaoResults.toDtoList()
+        kakaoResults.onSuccess {
+            return it.toDtoList()
+        }.onFailure { exception -> throw exception }
+        return null
     }
 }

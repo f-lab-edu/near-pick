@@ -5,5 +5,5 @@ data class UpdateUserAddressRequest(
     val receiverName: String,
     val phoneNumber: String,
     val addressDetail: String?,
-    val isDefault: Boolean? = false
+    val isDefault: Boolean = false
 )

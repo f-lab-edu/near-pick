@@ -7,5 +7,5 @@ data class UserAddressResponse(
     val phoneNumber: String?,
     val fullAddress: String,
     val addressDetail: String?,
-    val isDefault: Boolean?
+    val isDefault: Boolean
 )

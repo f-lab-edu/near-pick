@@ -11,5 +11,5 @@ data class CreateUserAddressRequest(
     val neighborhood: String?,
     val street: String?,
     val buildingNumber: String?,
-    val isDefault: Boolean? = false
+    val isDefault: Boolean = false
 )

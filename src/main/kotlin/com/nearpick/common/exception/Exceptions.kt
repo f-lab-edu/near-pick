@@ -34,9 +34,16 @@ class InvalidPasswordException() : BaseException(
     status = HttpStatus.UNAUTHORIZED
 )
 
-// 사용자 배송지 관련 예외
+// 사용자 주소 관련 예외
 class UserAddressNotFoundException(addressId: String, userId: String) : BaseException(
-    code = "USER_ADDRESS_NOT_FOUN지",
-    message = "해당 배송를 찾을 수 없습니다. (userId=$userId, addressId=$addressId)",
+    code = "USER_ADDRESS_NOT_FOUND",
+    message = "사용자의 주소 정보가 잘못되었습니다. (userId=$userId, addressId=$addressId)",
     status = HttpStatus.NOT_FOUND
+)
+
+// 주소 관련 예외
+class AddressNotFoundException(exception: String) : BaseException(
+    code = "ADDRESS_REST_API_INTERNAL_ERROR",
+    message = "$exception",
+    status = HttpStatus.INTERNAL_SERVER_ERROR
 )

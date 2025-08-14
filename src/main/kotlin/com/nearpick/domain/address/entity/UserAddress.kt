@@ -37,7 +37,7 @@ class UserAddress(
     val street: String?,
     val buildingNumber: String?,
 
-    var isDefault: Boolean? = false,
+    var isDefault: Boolean = false,
 
     @CreatedDate
     val createdAt: LocalDateTime? = null,
