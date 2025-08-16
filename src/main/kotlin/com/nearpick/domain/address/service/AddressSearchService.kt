@@ -1,8 +1,8 @@
 package com.nearpick.domain.address.service
 
+import com.nearpick.common.exception.ExternalApiException
 import com.nearpick.domain.address.client.KakaoAddressClient
 import com.nearpick.domain.address.dto.SearchAddressResponse
-import com.nearpick.domain.address.mapper.toDtoList
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,8 +12,8 @@ class AddressSearchService(
     fun searchAddress(query: String): List<SearchAddressResponse>? {
         val kakaoResults = kakaoAddressClient.searchAddress(query)
         kakaoResults.onSuccess {
-            return it.toDtoList()
-        }.onFailure { exception -> throw exception }
+            return SearchAddressResponse.toDtoList(it)
+        }.onFailure { exception -> throw ExternalApiException(exception.message) }
         return null
     }
 }

@@ -42,8 +42,14 @@ class UserAddressNotFoundException(addressId: String, userId: String) : BaseExce
 )
 
 // 주소 관련 예외
-class AddressNotFoundException(exception: String) : BaseException(
+class ExternalApiException(cause: String?) : BaseException(
     code = "ADDRESS_REST_API_INTERNAL_ERROR",
-    message = "$exception",
+    message = "카카오 주소 검색 중 오류가 발생했습니다 ($cause)",
     status = HttpStatus.INTERNAL_SERVER_ERROR
+)
+
+class InvalidPhoneNumberException(phoneNumber: String?) : BaseException(
+    code = "INVALID_PHONE_NUMBER",
+    message = "올바르지 않은 핸드폰 번호 형식입니다. ($phoneNumber)",
+    status = HttpStatus.BAD_REQUEST
 )

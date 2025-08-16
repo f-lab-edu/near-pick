@@ -4,8 +4,7 @@ import com.nearpick.common.exception.UserAddressNotFoundException
 import com.nearpick.domain.address.dto.CreateUserAddressRequest
 import com.nearpick.domain.address.dto.UpdateUserAddressRequest
 import com.nearpick.domain.address.dto.UserAddressResponse
-import com.nearpick.domain.address.mapper.toEntity
-import com.nearpick.domain.address.mapper.toResponse
+import com.nearpick.domain.address.entity.UserAddress
 import com.nearpick.domain.address.repository.UserAddressRepository
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
@@ -15,12 +14,12 @@ class UserAddressService(
     private val userAddressRepository: UserAddressRepository
 ) {
     fun createUserAddress(request: CreateUserAddressRequest, userId: String): UserAddressResponse {
-        val entity = request.toEntity(userId)
-        return userAddressRepository.save(entity).toResponse()
+        val entity = UserAddress.createByUser(request, userId)
+        return UserAddress.toResponse(userAddressRepository.save(entity))
     }
 
     fun findAllUserAddressByUserId(userId: String): List<UserAddressResponse> {
-        return userAddressRepository.findAllByUserId(userId).map { it.toResponse() }
+        return userAddressRepository.findAllByUserId(userId).map { UserAddress.toResponse(it) }
     }
 
     fun updateUserAddress(id: String, userId: String, req: UpdateUserAddressRequest): UserAddressResponse {
@@ -39,7 +38,7 @@ class UserAddressService(
             isDefault = req.isDefault
         }
 
-        return userAddressRepository.save(updated).toResponse()
+        return UserAddress.toResponse(userAddressRepository.save(updated))
     }
 
     fun deleteUserAddress(id: String, userId: String) {

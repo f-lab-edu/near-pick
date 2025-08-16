@@ -1,5 +1,7 @@
 package com.nearpick.domain.address.entity
 
+import com.nearpick.domain.address.dto.CreateUserAddressRequest
+import com.nearpick.domain.address.dto.UserAddressResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -18,7 +20,7 @@ import java.util.*
 @EntityListeners(AuditingEntityListener::class)
 class UserAddress(
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    val id: String,
 
     @Column(nullable = false)
     val userId: String,
@@ -37,7 +39,7 @@ class UserAddress(
     val street: String?,
     val buildingNumber: String?,
 
-    var isDefault: Boolean = false,
+    var isDefault: Boolean,
 
     @CreatedDate
     val createdAt: LocalDateTime? = null,
@@ -50,4 +52,37 @@ class UserAddress(
 
     @LastModifiedBy
     val updatedBy: String? = null
-)
+) {
+
+    companion object {
+        fun createByUser(addressRequest: CreateUserAddressRequest, userId: String): UserAddress {
+            return UserAddress(
+                id = UUID.randomUUID().toString(),
+                userId = userId,
+                name = addressRequest.name,
+                receiverName = addressRequest.receiverName,
+                phoneNumber = addressRequest.phoneNumber,
+                fullAddress = addressRequest.fullAddress,
+                addressDetail = addressRequest.addressDetail,
+                province = addressRequest.province,
+                district = addressRequest.district,
+                neighborhood = addressRequest.neighborhood,
+                street = addressRequest.street,
+                buildingNumber = addressRequest.buildingNumber,
+                isDefault = addressRequest.isDefault ?: false
+            )
+        }
+
+        fun toResponse(address: UserAddress): UserAddressResponse {
+            return UserAddressResponse(
+                id = address.id,
+                name = address.name,
+                receiverName = address.receiverName,
+                phoneNumber = address.phoneNumber,
+                fullAddress = address.fullAddress,
+                addressDetail = address.addressDetail,
+                isDefault = address.isDefault
+            )
+        }
+    }
+}
