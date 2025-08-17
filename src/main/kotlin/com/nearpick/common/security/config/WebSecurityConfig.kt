@@ -36,10 +36,10 @@ class WebSecurityConfig(
                     ).permitAll()
                     // 인증 관련
                     .requestMatchers(
-                        "/api/auth/login",
-                        "/api/auth/logout",
-                        "/api/auth/signup",
-                        "/api/users"
+                        "/api/v1/auth/login",
+                        "/api/v1/auth/logout",
+                        "/api/v1/auth/signup",
+                        "/api/v1/users"
                     ).permitAll()
                     .anyRequest().authenticated()
             }
