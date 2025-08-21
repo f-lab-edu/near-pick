@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 @EntityListeners(AuditingEntityListener::class)
 class User(
     @Id
@@ -35,8 +35,6 @@ class User(
     var profileImageUrl: String? = null,
 
     var phoneNumber: String? = null,
-
-    var locationId: String? = null,
 
     var accountHolderName: String? = null,
 
