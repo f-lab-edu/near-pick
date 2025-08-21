@@ -7,7 +7,6 @@ import com.nearpick.domain.address.dto.UserAddressResponse
 import com.nearpick.domain.address.entity.UserAddress
 import com.nearpick.domain.address.repository.UserAddressRepository
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrElse
 
 @Service
 class UserAddressService(
@@ -23,12 +22,8 @@ class UserAddressService(
     }
 
     fun updateUserAddress(id: String, userId: String, req: UpdateUserAddressRequest): UserAddressResponse {
-        val address = userAddressRepository.findByIdAndUserId(id, userId).getOrElse {
-            throw UserAddressNotFoundException(
-                id,
-                userId
-            )
-        }
+        val address =
+            userAddressRepository.findByIdAndUserId(id, userId) ?: throw throw UserAddressNotFoundException(id, userId)
 
         val updated = address.apply {
             name = req.name
@@ -42,12 +37,10 @@ class UserAddressService(
     }
 
     fun deleteUserAddress(id: String, userId: String) {
-        val address = userAddressRepository.findByIdAndUserId(id, userId).getOrElse {
-            throw UserAddressNotFoundException(
-                id,
-                userId
-            )
-        }
+        val address = userAddressRepository.findByIdAndUserId(id, userId) ?: throw throw UserAddressNotFoundException(
+            id,
+            userId
+        )
 
         userAddressRepository.delete(address)
     }

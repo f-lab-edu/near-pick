@@ -6,5 +6,5 @@ import java.util.*
 
 interface UserAddressRepository : JpaRepository<UserAddress, String> {
     fun findAllByUserId(userId: String): List<UserAddress>
-    fun findByIdAndUserId(id: String, userId: String): Optional<UserAddress>
+    fun findByIdAndUserId(id: String, userId: String): UserAddress?
 }
