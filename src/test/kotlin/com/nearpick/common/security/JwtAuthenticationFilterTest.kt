@@ -1,65 +1,72 @@
 package com.nearpick.common.security
 
+import com.nearpick.common.security.config.WebSecurityConfig
+import com.nearpick.domain.auth.dto.UserPrincipal
 import com.nearpick.domain.auth.service.CustomUserDetailsService
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.shouldNotBe
-import io.mockk.every
-import io.mockk.mockk
-import jakarta.servlet.FilterChain
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
+import com.nearpick.domain.test.controller.TestController
+import com.nearpick.domain.user.entity.User
+import org.mockito.Mockito
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.get
+import kotlin.test.Test
 
-class JwtAuthenticationFilterTest : StringSpec({
+@WebMvcTest(TestController::class)
+@Import(
+    WebSecurityConfig::class,
+    JwtAuthenticationFilter::class,
+    JwtAuthenticationEntryPoint::class,
+    JwtAccessDeniedHandler::class
+)
+@AutoConfigureMockMvc
+class JwtAuthenticationFilterTest(
+    @Autowired val mockMvc: MockMvc
+) {
 
-    val jwtTokenProvider = mockk<JwtTokenProvider>()
-    val userDetailsService = mockk<CustomUserDetailsService>()
-    val filter = JwtAuthenticationFilterForTest(jwtTokenProvider, userDetailsService)
-    val request = mockk<HttpServletRequest>(relaxed = true)
-    val response = mockk<HttpServletResponse>(relaxed = true)
-    val chain = mockk<FilterChain>(relaxed = true)
+    @MockitoBean
+    lateinit var jwtTokenProvider: JwtTokenProvider
 
-    beforeTest {
-        SecurityContextHolder.clearContext()
+    @MockitoBean
+    lateinit var userDetailsService: CustomUserDetailsService
+
+    @Test
+    fun `토큰이 없으면 SecurityContext에 인증 정보가 없어야 한다`() {
+        mockMvc.get("/api/test")
+            .andExpect {
+                status { isUnauthorized() }
+            }
     }
 
-    "토큰이 없으면 SecurityContext에 인증 정보가 없어야 한다" {
-        every { request.getHeader("Authorization") } returns null
+    @Test
+    fun `토큰이 유효하지 않으면 SecurityContext에 인증 정보가 없어야 한다`() {
+        Mockito.`when`(jwtTokenProvider.validateToken("invalid.token")).thenReturn(false)
 
-        filter.testDoFilterInternal(request, response, chain)
-
-        SecurityContextHolder.getContext().authentication.shouldBeNull()
+        mockMvc.get("/api/test") {
+            header("Authorization", "Bearer invalid.token")
+        }.andExpect {
+            status { isUnauthorized() }
+        }
     }
 
-    "토큰이 유효하지 않으면 SecurityContext에 인증 정보가 없어야 한다" {
-        every { request.getHeader("Authorization") } returns "Bearer invalid.token"
-        every { jwtTokenProvider.validateToken("invalid.token") } returns false
-
-        filter.testDoFilterInternal(request, response, chain)
-
-        SecurityContextHolder.getContext().authentication.shouldBeNull()
-    }
-
-    "유효한 토큰이면 SecurityContext에 유효한 인증 정보가 설정 되어야 한다" {
-        val token = "Bearer valid.token"
+    @Test
+    fun `유효한 토큰이면 SecurityContext에 유효한 인증 정보가 설정 되어야 한다`() {
+        val token = "valid.token"
         val userId = "user-123"
-        val userDetails = User("user-123", "", listOf()) // empty authorities
+        val userDetails = UserPrincipal.from(User(userId, "", "", ""))
 
-        every { request.getHeader("Authorization") } returns token
-        every { jwtTokenProvider.validateToken("valid.token") } returns true
-        every { jwtTokenProvider.getUserId("valid.token") } returns userId
-        every { userDetailsService.loadUserByUsername(userId) } returns userDetails
-        every { request.remoteAddr } returns "127.0.0.1"
-        every { request.session } returns null
+        Mockito.`when`(jwtTokenProvider.validateToken(token)).thenReturn(true)
+        Mockito.`when`(jwtTokenProvider.getUserId(token)).thenReturn(userId)
+        Mockito.`when`(userDetailsService.loadUserByUsername(userId)).thenReturn(userDetails)
 
-        filter.testDoFilterInternal(request, response, chain)
-
-        val auth = SecurityContextHolder.getContext().authentication
-        auth.shouldNotBe(null)
-        auth!!.principal shouldNotBe null
-        auth is UsernamePasswordAuthenticationToken
+        mockMvc.get("/api/test") {
+            header("Authorization", "Bearer $token")
+        }.andExpect {
+            status { isOk() }
+            content { string("authenticated") }
+        }
     }
-})
+}
