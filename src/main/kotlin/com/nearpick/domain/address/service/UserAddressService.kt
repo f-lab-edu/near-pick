@@ -23,7 +23,7 @@ class UserAddressService(
 
     fun updateUserAddress(id: String, userId: String, req: UpdateUserAddressRequest): UserAddressResponse {
         val address =
-            userAddressRepository.findByIdAndUserId(id, userId) ?: throw throw UserAddressNotFoundException(id, userId)
+            userAddressRepository.findByIdAndUserId(id, userId) ?: throw UserAddressNotFoundException(id, userId)
 
         val updated = address.apply {
             name = req.name
@@ -37,7 +37,7 @@ class UserAddressService(
     }
 
     fun deleteUserAddress(id: String, userId: String) {
-        val address = userAddressRepository.findByIdAndUserId(id, userId) ?: throw throw UserAddressNotFoundException(
+        val address = userAddressRepository.findByIdAndUserId(id, userId) ?: throw UserAddressNotFoundException(
             id,
             userId
         )

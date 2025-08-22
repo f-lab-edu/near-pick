@@ -2,8 +2,12 @@ package com.nearpick.domain.user.service
 
 import com.nearpick.common.constant.Role
 import com.nearpick.common.exception.EmailAlreadyExistsException
+import com.nearpick.common.exception.InvalidFormatEmailException
+import com.nearpick.common.exception.InvalidFormatNicknameException
 import com.nearpick.common.exception.InvalidRoleException
+import com.nearpick.common.exception.NicknameAlreadyExistsException
 import com.nearpick.common.exception.UserNotFoundException
+import com.nearpick.common.validator.Validator
 import com.nearpick.domain.user.dto.CreateUserRequest
 import com.nearpick.domain.user.dto.UpdateUserRequest
 import com.nearpick.domain.user.dto.UserResponse
@@ -20,9 +24,8 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ) {
     fun createUser(request: CreateUserRequest): UserResponse {
-        if (userRepository.existsByEmail(request.email)) {
-            throw EmailAlreadyExistsException(request.email)
-        }
+        checkEmail(request.email)
+        checkNickname(request.nickname)
 
         val parsedRole = Role.from(request.role)
         if (parsedRole == Role.ADMIN) {
@@ -36,6 +39,24 @@ class UserService(
         return userRepository.save(user).toResponse()
     }
 
+    fun checkEmail(email: String) {
+        if (Validator.isValidEmail(email)) {
+            throw InvalidFormatEmailException(email)
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw EmailAlreadyExistsException(email)
+        }
+    }
+
+    fun checkNickname(nickname: String) {
+        if (!Validator.isValidNickname(nickname)) {
+            throw InvalidFormatNicknameException(nickname)
+        }
+        if (userRepository.existsByNickname(nickname)) {
+            throw NicknameAlreadyExistsException(nickname)
+        }
+    }
+
     fun getUserById(id: String): UserResponse {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
@@ -43,9 +64,13 @@ class UserService(
     }
 
     fun updateUser(id: String, request: UpdateUserRequest): UserResponse {
+        if (!request.email.isNullOrBlank()) { checkEmail(request.email) }
+        if (!request.nickname.isNullOrBlank()) { checkNickname(request.nickname) }
+
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
         user.apply {
+            email = request.email ?: email
             nickname = request.nickname ?: nickname
             profileImageUrl = request.profileImageUrl ?: profileImageUrl
             phoneNumber = request.phoneNumber ?: phoneNumber

@@ -24,7 +24,7 @@ class User(
     val id: String = UUID.randomUUID().toString(),
 
     @Column(unique = true, nullable = false)
-    val email: String,
+    var email: String,
 
     @Column(unique = true, nullable = false)
     var nickname: String,
