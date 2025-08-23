@@ -1,9 +1,9 @@
 package com.nearpick.domain.verification.service
 
 import com.nearpick.common.exception.InvalidEmailVerificationException
-import com.nearpick.common.exception.InvalidEmailVerificationNumberException
 import com.nearpick.common.exception.InvalidEmailVerificationRequestException
 import com.nearpick.common.exception.InvalidEmailVerificationTimeException
+import com.nearpick.common.exception.InvalidEmailVerificationTokenException
 import com.nearpick.common.mail.EmailSender
 import com.nearpick.domain.verification.entity.Verification
 import com.nearpick.domain.verification.enum.VerificationStatus
@@ -52,7 +52,7 @@ class VerificationService(
                 verification.status = VerificationStatus.FAILED.name
                 repository.save(verification)
 
-                throw InvalidEmailVerificationNumberException(email, token)
+                throw InvalidEmailVerificationTokenException(email, token)
             }
 
             else -> {

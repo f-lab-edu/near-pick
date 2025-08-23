@@ -57,9 +57,9 @@ class InvalidEmailVerificationException(email: String?) : BaseException(
     status = HttpStatus.BAD_REQUEST
 )
 
-class InvalidEmailVerificationNumberException(email: String?, emailVerificationNumber: String?) : BaseException(
-    code = "INVALID_EMAIL_VERIFICATION_NUMBER",
-    message = "올바르지 않은 이메일 인증 번호입니다. ($email, $emailVerificationNumber)",
+class InvalidEmailVerificationTokenException(email: String?, emailVerificationToken: String?) : BaseException(
+    code = "INVALID_EMAIL_VERIFICATION_TOKEN",
+    message = "올바르지 않은 이메일 인증 토큰입니다. ($email, $emailVerificationToken)",
     status = HttpStatus.BAD_REQUEST
 )
 
