@@ -7,7 +7,7 @@ import com.nearpick.domain.user.dto.CheckEmailVerificationRequest
 import com.nearpick.domain.user.dto.CreateUserRequest
 import com.nearpick.domain.user.dto.UpdateUserRequest
 import com.nearpick.domain.user.dto.UserResponse
-import com.nearpick.domain.user.mapper.toResponse
+import com.nearpick.domain.user.entity.User
 import com.nearpick.domain.user.service.UserService
 import com.nearpick.domain.verification.enum.VerificationType
 import com.nearpick.domain.verification.service.VerificationService
@@ -111,6 +111,7 @@ class UserController(
     fun getMyInfo(
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Response<UserResponse>> {
-        return ResponseEntity.ok(Response.success(userPrincipal.getUser().toResponse()))
+        val user = userPrincipal.getUser()
+        return ResponseEntity.ok(Response.success(User.toResponse(user)))
     }
 }

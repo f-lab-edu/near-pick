@@ -11,8 +11,7 @@ import com.nearpick.common.validator.Validator
 import com.nearpick.domain.user.dto.CreateUserRequest
 import com.nearpick.domain.user.dto.UpdateUserRequest
 import com.nearpick.domain.user.dto.UserResponse
-import com.nearpick.domain.user.mapper.toEntity
-import com.nearpick.domain.user.mapper.toResponse
+import com.nearpick.domain.user.entity.User
 import com.nearpick.domain.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -34,9 +33,8 @@ class UserService(
 
         val encryptedPassword = passwordEncoder.encode(request.password)
 
-        val user = request.toEntity(parsedRole, encryptedPassword)
-
-        return userRepository.save(user).toResponse()
+        val createdUser = userRepository.save(User.toEntity(request, parsedRole, encryptedPassword))
+        return User.toResponse(createdUser)
     }
 
     fun checkEmail(email: String) {
@@ -60,7 +58,7 @@ class UserService(
     fun getUserById(id: String): UserResponse {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
-        return user.toResponse()
+        return User.toResponse(user)
     }
 
     fun updateUser(id: String, request: UpdateUserRequest): UserResponse {
@@ -74,9 +72,13 @@ class UserService(
             nickname = request.nickname ?: nickname
             profileImageUrl = request.profileImageUrl ?: profileImageUrl
             phoneNumber = request.phoneNumber ?: phoneNumber
+            accountHolderName = request.accountHolderName ?: accountHolderName
+            bankName = request.bankName ?: bankName
+            accountNumber = request.accountNumber ?: accountNumber
         }
 
-        return userRepository.save(user).toResponse()
+        val updatedUser = userRepository.save(user)
+        return User.toResponse(updatedUser)
     }
 
     fun deleteUser(id: String) {

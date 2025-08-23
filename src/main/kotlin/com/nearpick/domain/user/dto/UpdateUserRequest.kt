@@ -4,5 +4,8 @@ data class UpdateUserRequest(
     val email: String?,
     val nickname: String?,
     val profileImageUrl: String?,
-    val phoneNumber: String?
+    val phoneNumber: String?,
+    var accountHolderName: String?,
+    var bankName: String?,
+    var accountNumber: String?
 )
