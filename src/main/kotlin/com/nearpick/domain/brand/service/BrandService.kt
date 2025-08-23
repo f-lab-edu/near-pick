@@ -30,15 +30,13 @@ class BrandService(
     }
 
     fun findBrandDetail(id: String): GetBrandDetailResponse {
-        val brand = brandRepository.findById(id).orElse(null)
-            ?: throw BrandNotFoundException(id, null)
+        val brand = getBrand(id)
 
         return Brand.toDetailResponse(brand)
     }
 
     fun updateBrand(id: String, user: User, request: UpdateBrandRequest): BrandResponse {
-        val brand = brandRepository.findByIdAndOwnerUser(id, user)
-            ?: throw BrandNotFoundException(id, user.id)
+        val brand = getBrand(id, user)
 
         val updated = brand.apply {
             name = request.name
@@ -55,9 +53,16 @@ class BrandService(
     }
 
     fun deleteBrand(id: String, user: User) {
-        val brand = brandRepository.findByIdAndOwnerUser(id, user)
-            ?: throw BrandNotFoundException(id, user.id)
+        val brand = getBrand(id, user)
 
         brandRepository.delete(brand)
     }
+
+    private fun getBrand(id: String): Brand =
+        brandRepository.findById(id).orElse(null)
+            ?: throw BrandNotFoundException(id, null)
+
+    private fun getBrand(id: String, user: User): Brand =
+        brandRepository.findByIdAndOwnerUser(id, user)
+            ?: throw BrandNotFoundException(id, user.id)
 }
