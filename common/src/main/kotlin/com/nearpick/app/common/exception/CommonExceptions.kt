@@ -120,3 +120,10 @@ class BrandAlreadyExistsException(brand: String) : BaseException(
     message = "이미 등록된 사업자 등록 번호입니다. (brand=$brand)",
     status = HttpStatus.BAD_REQUEST
 )
+
+// 상품 정보 관련 예외
+class ProductNotFoundException(productId: String?, userId: String?) : BaseException(
+    code = "PRODUCT_NOT_FOUND",
+    message = "사용자의 상품 정보가 잘못되었습니다. (productId=$productId)",
+    status = HttpStatus.NOT_FOUND
+)
