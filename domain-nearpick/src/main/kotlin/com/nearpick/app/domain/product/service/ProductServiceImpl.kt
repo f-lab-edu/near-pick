@@ -13,12 +13,13 @@ import com.nearpick.app.domain.product.entity.Product
 import com.nearpick.app.domain.product.repository.ProductRepository
 import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 open class ProductServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository,

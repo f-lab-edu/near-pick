@@ -9,12 +9,13 @@ import com.nearpick.app.domain.verification.entity.Verification
 import com.nearpick.app.domain.verification.enum.VerificationStatus
 import com.nearpick.app.domain.verification.enum.VerificationType
 import com.nearpick.app.domain.verification.repository.VerificationRepository
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 
 @Service
+@Transactional(readOnly = true)
 open class VerificationServiceImpl(
     private val repository: VerificationRepository,
     private val emailSender: EmailSender

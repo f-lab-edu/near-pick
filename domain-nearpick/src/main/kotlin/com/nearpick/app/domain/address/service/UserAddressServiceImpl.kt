@@ -6,10 +6,11 @@ import com.nearpick.app.domain.address.dto.UpdateUserAddressRequest
 import com.nearpick.app.domain.address.dto.UserAddressResponse
 import com.nearpick.app.domain.address.entity.UserAddress
 import com.nearpick.app.domain.address.repository.UserAddressRepository
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 
 @Service
+@Transactional(readOnly = true)
 open class UserAddressServiceImpl(
     private val userAddressRepository: UserAddressRepository
 ) : UserAddressService {

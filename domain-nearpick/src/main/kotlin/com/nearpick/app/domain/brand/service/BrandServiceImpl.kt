@@ -10,11 +10,12 @@ import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
 import com.nearpick.app.domain.brand.dto.UpdateBrandRequest
 import com.nearpick.app.domain.user.repository.UserRepository
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 open class BrandServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository

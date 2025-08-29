@@ -13,12 +13,13 @@ import com.nearpick.app.domain.user.dto.UpdateUserRequest
 import com.nearpick.app.domain.user.dto.UserResponse
 import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 open class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
