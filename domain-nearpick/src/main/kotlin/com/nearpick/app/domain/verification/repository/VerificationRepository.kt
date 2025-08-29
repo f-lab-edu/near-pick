@@ -1,6 +1,6 @@
-package com.nearpick.domain.verification.repository
+package com.nearpick.app.domain.verification.repository
 
-import com.nearpick.domain.verification.entity.Verification
+import com.nearpick.app.domain.verification.entity.Verification
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface VerificationRepository : JpaRepository<Verification, String> {

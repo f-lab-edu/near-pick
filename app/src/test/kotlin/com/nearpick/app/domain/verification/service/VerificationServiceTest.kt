@@ -1,13 +1,13 @@
-package com.nearpick.domain.verification.service
+package com.nearpick.app.domain.verification.service
 
-import com.nearpick.common.exception.InvalidEmailVerificationException
-import com.nearpick.common.exception.InvalidEmailVerificationTimeException
-import com.nearpick.common.exception.InvalidEmailVerificationTokenException
-import com.nearpick.common.mail.EmailSender
-import com.nearpick.domain.verification.entity.Verification
-import com.nearpick.domain.verification.enum.VerificationStatus
-import com.nearpick.domain.verification.enum.VerificationType
-import com.nearpick.domain.verification.repository.VerificationRepository
+import com.nearpick.app.common.exception.InvalidEmailVerificationException
+import com.nearpick.app.common.exception.InvalidEmailVerificationTimeException
+import com.nearpick.app.common.exception.InvalidEmailVerificationTokenException
+import com.nearpick.app.common.mail.EmailSender
+import com.nearpick.app.domain.verification.entity.Verification
+import com.nearpick.app.domain.verification.enum.VerificationStatus
+import com.nearpick.app.domain.verification.enum.VerificationType
+import com.nearpick.app.domain.verification.repository.VerificationRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -22,7 +22,7 @@ import java.util.*
 class VerificationServiceTest : StringSpec({
     val verificationRepository = mock<VerificationRepository>()
     val emailSender = mock<EmailSender>()
-    val verificationService = VerificationService(verificationRepository, emailSender)
+    val verificationService = VerificationServiceImpl(verificationRepository, emailSender)
 
     "만료 시간이 지난 경우 InvalidEmailVerificationTimeException을 발생한다." {
         val email = "user@example.com"

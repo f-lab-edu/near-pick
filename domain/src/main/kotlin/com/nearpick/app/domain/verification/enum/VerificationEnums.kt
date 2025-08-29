@@ -1,4 +1,4 @@
-package com.nearpick.domain.verification.enum
+package com.nearpick.app.domain.verification.enum
 
 enum class VerificationType(val code: String) {
     SIGNUP_EMAIL("signup_email"),

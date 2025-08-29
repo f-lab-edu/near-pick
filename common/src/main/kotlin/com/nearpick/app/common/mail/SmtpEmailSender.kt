@@ -1,4 +1,4 @@
-package com.nearpick.common.mail
+package com.nearpick.app.common.mail
 
 import org.springframework.mail.MailException
 import org.springframework.mail.MailSendException

@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.user.dto
 
-import com.nearpick.common.exception.InvalidPhoneNumberException
-import com.nearpick.common.validator.Validator
+import com.nearpick.app.common.exception.InvalidPhoneNumberException
+import com.nearpick.app.common.validator.Validator
 
 data class CreateUserRequest(
     val email: String,

@@ -1,6 +1,6 @@
-package com.nearpick.domain.verification.entity
+package com.nearpick.app.domain.verification.entity
 
-import com.nearpick.domain.verification.enum.VerificationStatus
+import com.nearpick.app.domain.verification.enum.VerificationStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners

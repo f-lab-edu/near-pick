@@ -1,27 +1,29 @@
-package com.nearpick.domain.verification.service
+package com.nearpick.app.domain.verification.service
 
-import com.nearpick.common.exception.InvalidEmailVerificationException
-import com.nearpick.common.exception.InvalidEmailVerificationRequestException
-import com.nearpick.common.exception.InvalidEmailVerificationTimeException
-import com.nearpick.common.exception.InvalidEmailVerificationTokenException
-import com.nearpick.common.mail.EmailSender
-import com.nearpick.domain.verification.entity.Verification
-import com.nearpick.domain.verification.enum.VerificationStatus
-import com.nearpick.domain.verification.enum.VerificationType
-import com.nearpick.domain.verification.repository.VerificationRepository
+import com.nearpick.app.common.exception.InvalidEmailVerificationException
+import com.nearpick.app.common.exception.InvalidEmailVerificationRequestException
+import com.nearpick.app.common.exception.InvalidEmailVerificationTimeException
+import com.nearpick.app.common.exception.InvalidEmailVerificationTokenException
+import com.nearpick.app.common.mail.EmailSender
+import com.nearpick.app.domain.verification.entity.Verification
+import com.nearpick.app.domain.verification.enum.VerificationStatus
+import com.nearpick.app.domain.verification.enum.VerificationType
+import com.nearpick.app.domain.verification.repository.VerificationRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
+
 @Service
-class VerificationService(
+open class VerificationServiceImpl(
     private val repository: VerificationRepository,
     private val emailSender: EmailSender
-) {
+) : VerificationService {
+
     private val EXPIRATION_MINUTES = 10L
 
     @Transactional
-    fun sendVerificationCode(type: VerificationType, email: String, subject: String) {
+    override fun sendVerificationCode(type: VerificationType, email: String, subject: String) {
         val token = generateToken()
 
         val verification = Verification.from(type.name, email, token, EXPIRATION_MINUTES)
@@ -32,7 +34,7 @@ class VerificationService(
     }
 
     @Transactional
-    fun verifyCode(type: VerificationType, email: String, token: String): Boolean {
+    override fun verifyCode(type: VerificationType, email: String, token: String): Boolean {
         val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type.name, email)
             ?: throw InvalidEmailVerificationRequestException(email)
 
@@ -65,7 +67,7 @@ class VerificationService(
     }
 
     @Transactional
-    fun isVerifyEmail(type: VerificationType, email: String): Boolean {
+    override fun isVerifyEmail(type: VerificationType, email: String): Boolean {
         val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type.name, email)
             ?: throw InvalidEmailVerificationRequestException(email)
 
@@ -89,3 +91,4 @@ class VerificationService(
 
     private fun generateToken(): String = (100_000..999_999).random().toString()
 }
+
