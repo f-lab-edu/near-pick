@@ -1,7 +1,7 @@
-package com.nearpick.domain.brand.dto
+package com.nearpick.app.domain.brand.dto
 
-import com.nearpick.common.exception.InvalidBusinessRegistrationNumberException
-import com.nearpick.common.validator.Validator
+import com.nearpick.app.common.exception.InvalidBusinessRegistrationNumberException
+import com.nearpick.app.common.validator.Validator
 
 data class CreateBrandRequest(
     val name: String,

@@ -1,9 +1,9 @@
-package com.nearpick.domain.brand.entity
+package com.nearpick.app.domain.brand.entity
 
-import com.nearpick.domain.brand.dto.BrandResponse
-import com.nearpick.domain.brand.dto.CreateBrandRequest
-import com.nearpick.domain.brand.dto.GetBrandDetailResponse
-import com.nearpick.domain.user.entity.User
+import com.nearpick.app.domain.brand.dto.BrandResponse
+import com.nearpick.app.domain.brand.dto.CreateBrandRequest
+import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
+import com.nearpick.app.domain.user.entity.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -30,7 +30,7 @@ class Brand(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id", nullable = false)
-    val ownerUser: User, // User 엔티티 참조
+    val ownerUser: User,
 
     var name: String,
 

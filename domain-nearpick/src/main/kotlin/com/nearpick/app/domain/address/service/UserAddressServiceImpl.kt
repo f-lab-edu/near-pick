@@ -26,11 +26,11 @@ class UserAddressServiceImpl(
             userAddressRepository.findByIdAndUserId(id, userId) ?: throw UserAddressNotFoundException(id, userId)
 
         val updated = address.apply {
-            name = req.name
-            receiverName = req.receiverName
-            phoneNumber = req.phoneNumber
-            addressDetail = req.addressDetail
-            isDefault = req.isDefault
+            name = req.name ?: name
+            receiverName = req.receiverName ?: receiverName
+            phoneNumber = req.phoneNumber ?: phoneNumber
+            addressDetail = req.addressDetail ?: addressDetail
+            isDefault = req.isDefault ?: isDefault
         }
 
         return UserAddress.toResponse(userAddressRepository.save(updated))

@@ -1,9 +1,9 @@
-package com.nearpick.domain.brand.dto
+package com.nearpick.app.domain.brand.dto
 
 data class UpdateBrandRequest(
-    val name: String,
+    val name: String? = null,
     val description: String? = null,
-    val fullAddress: String,
+    val fullAddress: String? = null,
     val addressDetail: String? = null,
     val province: String? = null,
     val district: String? = null,

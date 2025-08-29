@@ -1,12 +1,12 @@
-package com.nearpick.domain.brand.controller
+package com.nearpick.app.domain.brand.controller
 
-import com.nearpick.common.response.Response
-import com.nearpick.domain.auth.dto.UserPrincipal
-import com.nearpick.domain.brand.dto.BrandResponse
-import com.nearpick.domain.brand.dto.CreateBrandRequest
-import com.nearpick.domain.brand.dto.GetBrandDetailResponse
-import com.nearpick.domain.brand.dto.UpdateBrandRequest
-import com.nearpick.domain.brand.service.BrandService
+import com.nearpick.app.common.response.Response
+import com.nearpick.app.common.user.UserPrincipal
+import com.nearpick.app.domain.brand.dto.BrandResponse
+import com.nearpick.app.domain.brand.dto.CreateBrandRequest
+import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
+import com.nearpick.app.domain.brand.dto.UpdateBrandRequest
+import com.nearpick.app.domain.brand.service.BrandService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.http.ResponseEntity
@@ -36,7 +36,7 @@ class BrandController(
     ): ResponseEntity<Response<BrandResponse>> {
         return ResponseEntity.ok(
             Response.success(
-                brandService.createBrand(request, userPrincipal.getUser())
+                brandService.createBrand(request, userPrincipal.getUserId())
             )
         )
     }
@@ -50,7 +50,7 @@ class BrandController(
     ): ResponseEntity<Response<List<BrandResponse>>> {
         return ResponseEntity.ok(
             Response.success(
-                brandService.findAllBrandByOwnerUser(userPrincipal.getUser())
+                brandService.findAllBrandByOwnerUser(userPrincipal.getUserId())
             )
         )
     }
@@ -79,7 +79,7 @@ class BrandController(
     ): ResponseEntity<Response<BrandResponse>> {
         return ResponseEntity.ok(
             Response.success(
-                brandService.updateBrand(id, userPrincipal.getUser(), request)
+                brandService.updateBrand(id, userPrincipal.getUserId(), request)
             )
         )
     }
@@ -91,7 +91,7 @@ class BrandController(
         @PathVariable id: String,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Response<String>> {
-        brandService.deleteBrand(id, userPrincipal.getUser())
+        brandService.deleteBrand(id, userPrincipal.getUserId())
         return ResponseEntity.ok(Response.success("success"))
     }
 }

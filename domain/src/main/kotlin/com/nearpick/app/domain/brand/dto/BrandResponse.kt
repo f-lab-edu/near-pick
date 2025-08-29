@@ -1,10 +1,7 @@
-package com.nearpick.domain.brand.dto
+package com.nearpick.app.domain.brand.dto
 
-import com.nearpick.domain.user.dto.UserResponse
-
-data class GetBrandDetailResponse(
+data class BrandResponse(
     val id: String,
-    val ownerUser: UserResponse,
     val name: String,
     val description: String? = null,
     val businessRegistrationNumber: String,
