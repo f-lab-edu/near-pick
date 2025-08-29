@@ -13,7 +13,7 @@ import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "user_address")

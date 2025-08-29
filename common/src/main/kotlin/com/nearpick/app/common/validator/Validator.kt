@@ -5,6 +5,10 @@ object Validator {
         return phone.length == 11
     }
 
+    fun isValidNickname(nickname: String): Boolean {
+        return nickname.length <= 15
+    }
+
     fun isValidEmail(email: String): Boolean {
         val regex = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\$")
         return regex.matches(email)

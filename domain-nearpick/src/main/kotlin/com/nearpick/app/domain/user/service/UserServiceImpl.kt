@@ -2,13 +2,16 @@ package com.nearpick.app.domain.user.service
 
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.EmailAlreadyExistsException
+import com.nearpick.app.common.exception.InvalidFormatEmailException
 import com.nearpick.app.common.exception.InvalidRoleException
 import com.nearpick.app.common.exception.UserNotFoundException
+import com.nearpick.app.common.exception.InvalidFormatNicknameException
+import com.nearpick.app.common.exception.NicknameAlreadyExistsException
+import com.nearpick.app.common.validator.Validator
 import com.nearpick.app.domain.user.dto.CreateUserRequest
 import com.nearpick.app.domain.user.dto.UpdateUserRequest
 import com.nearpick.app.domain.user.dto.UserResponse
-import com.nearpick.app.domain.user.mapper.toEntity
-import com.nearpick.app.domain.user.mapper.toResponse
+import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -20,9 +23,8 @@ class UserServiceImpl(
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
     override fun createUser(request: CreateUserRequest): UserResponse {
-        if (userRepository.existsByEmail(request.email)) {
-            throw EmailAlreadyExistsException(request.email)
-        }
+        checkEmail(request.email)
+        checkNickname(request.nickname)
 
         val parsedRole = Role.from(request.role)
         if (parsedRole == Role.ADMIN) {
@@ -31,27 +33,55 @@ class UserServiceImpl(
 
         val encryptedPassword = passwordEncoder.encode(request.password)
 
-        val user = request.toEntity(parsedRole, encryptedPassword)
+        val createdUser = userRepository.save(User.toEntity(request, parsedRole, encryptedPassword))
+        return User.toResponse(createdUser)
+    }
 
-        return userRepository.save(user).toResponse()
+    override fun checkEmail(email: String) {
+        if (Validator.isValidEmail(email)) {
+            throw InvalidFormatEmailException(email)
+        }
+        if (userRepository.existsByEmail(email)) {
+            throw EmailAlreadyExistsException(email)
+        }
+    }
+
+    override fun checkNickname(nickname: String) {
+        if (!Validator.isValidNickname(nickname)) {
+            throw InvalidFormatNicknameException(nickname)
+        }
+        if (userRepository.existsByNickname(nickname)) {
+            throw NicknameAlreadyExistsException(nickname)
+        }
     }
 
     override fun getUserById(id: String): UserResponse {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
-        return user.toResponse()
+        return User.toResponse(user)
     }
 
     override fun updateUser(id: String, request: UpdateUserRequest): UserResponse {
+        val newEmail = request.email
+        if (!newEmail.isNullOrBlank()) { checkEmail(newEmail) }
+
+        val newNickname = request.nickname
+        if (!newNickname.isNullOrBlank()) { checkNickname(newNickname) }
+
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
         user.apply {
+            email = request.email ?: email
             nickname = request.nickname ?: nickname
             profileImageUrl = request.profileImageUrl ?: profileImageUrl
             phoneNumber = request.phoneNumber ?: phoneNumber
+            accountHolderName = request.accountHolderName ?: accountHolderName
+            bankName = request.bankName ?: bankName
+            accountNumber = request.accountNumber ?: accountNumber
         }
 
-        return userRepository.save(user).toResponse()
+        val updatedUser = userRepository.save(user)
+        return User.toResponse(updatedUser)
     }
 
     override fun deleteUser(id: String) {

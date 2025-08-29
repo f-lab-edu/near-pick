@@ -1,6 +1,8 @@
 package com.nearpick.app.domain.user.entity
 
 import com.nearpick.app.common.constant.Role
+import com.nearpick.app.domain.user.dto.CreateUserRequest
+import com.nearpick.app.domain.user.dto.UserResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -15,7 +17,6 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import java.util.*
-
 @Entity
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener::class)
@@ -24,7 +25,7 @@ class User(
     val id: String = UUID.randomUUID().toString(),
 
     @Column(unique = true, nullable = false)
-    val email: String,
+    var email: String,
 
     @Column(unique = true, nullable = false)
     var nickname: String,
@@ -58,4 +59,32 @@ class User(
 
     @LastModifiedBy
     var updatedBy: String? = null
-)
+) {
+    companion object {
+        fun toEntity(createUserRequest: CreateUserRequest, role: Role, encodedPassword: String): User = User(
+            id = UUID.randomUUID().toString(),
+            email = createUserRequest.email,
+            nickname = createUserRequest.nickname,
+            password = encodedPassword,
+            profileImageUrl = createUserRequest.profileImageUrl,
+            phoneNumber = createUserRequest.phoneNumber,
+            role = role,
+            accountHolderName = createUserRequest.accountHolderName,
+            bankName = createUserRequest.bankName,
+            accountNumber = createUserRequest.accountNumber
+        )
+
+        fun toResponse(user: User): UserResponse = UserResponse(
+            id = user.id,
+            email = user.email,
+            nickname = user.nickname,
+            profileImageUrl = user.profileImageUrl,
+            phoneNumber = user.phoneNumber,
+            role = user.role.name,
+            accountHolderName = user.accountHolderName,
+            bankName = user.bankName,
+            accountNumber = user.accountNumber,
+            isActive = user.isActive
+        )
+    }
+}

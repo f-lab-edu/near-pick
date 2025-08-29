@@ -39,7 +39,10 @@ class WebSecurityConfig(
                         "/api/v1/auth/login",
                         "/api/v1/auth/logout",
                         "/api/v1/auth/signup",
-                        "/api/v1/users"
+                        "/api/v1/users",
+                        "/api/v1/users/nickname",
+                        "/api/v1/users/email",
+                        "/api/v1/users/email/verification"
                     ).permitAll()
                     .anyRequest().authenticated()
             }

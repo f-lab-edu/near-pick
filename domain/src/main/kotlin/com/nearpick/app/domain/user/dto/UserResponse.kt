@@ -7,5 +7,8 @@ data class UserResponse(
     val profileImageUrl: String?,
     val phoneNumber: String?,
     val role: String,
+    val accountHolderName: String?,
+    val bankName: String?,
+    val accountNumber: String?,
     val isActive: Boolean
 )
