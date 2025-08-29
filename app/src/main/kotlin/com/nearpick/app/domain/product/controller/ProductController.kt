@@ -1,12 +1,12 @@
-package com.nearpick.domain.product.controller
+package com.nearpick.app.domain.product.controller
 
-import com.nearpick.common.response.Response
-import com.nearpick.domain.auth.dto.UserPrincipal
-import com.nearpick.domain.product.dto.CreateProductRequest
-import com.nearpick.domain.product.dto.GetProductDetailResponse
-import com.nearpick.domain.product.dto.ProductResponse
-import com.nearpick.domain.product.dto.UpdateProductRequest
-import com.nearpick.domain.product.service.ProductService
+import com.nearpick.app.common.response.Response
+import com.nearpick.app.common.user.UserPrincipal
+import com.nearpick.app.domain.product.dto.CreateProductRequest
+import com.nearpick.app.domain.product.dto.GetProductDetailResponse
+import com.nearpick.app.domain.product.dto.ProductResponse
+import com.nearpick.app.domain.product.dto.UpdateProductRequest
+import com.nearpick.app.domain.product.service.ProductService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.http.ResponseEntity
@@ -36,7 +36,7 @@ class ProductController(
     ): ResponseEntity<Response<ProductResponse>> {
         return ResponseEntity.ok(
             Response.success(
-                productService.createProduct(request, userPrincipal.getUser())
+                productService.createProduct(request, userPrincipal.getUserId())
             )
         )
     }
@@ -78,7 +78,7 @@ class ProductController(
     ): ResponseEntity<Response<ProductResponse>> {
         return ResponseEntity.ok(
             Response.success(
-                productService.updateProduct(id, userPrincipal.getUser(), request)
+                productService.updateProduct(id, userPrincipal.getUserId(), request)
             )
         )
     }
@@ -90,7 +90,7 @@ class ProductController(
         @PathVariable id: String,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
     ): ResponseEntity<Response<String>> {
-        productService.deleteProduct(id, userPrincipal.getUser())
+        productService.deleteProduct(id, userPrincipal.getUserId())
         return ResponseEntity.ok(Response.success("success"))
     }
 }

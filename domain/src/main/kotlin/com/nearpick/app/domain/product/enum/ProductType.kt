@@ -1,4 +1,4 @@
-package com.nearpick.domain.product.enum
+package com.nearpick.app.domain.product.enum
 
 enum class ProductType {
     NORMAL, RESERVATION, FIRST_COME

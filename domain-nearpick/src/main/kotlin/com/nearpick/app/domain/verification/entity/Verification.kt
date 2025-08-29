@@ -38,16 +38,16 @@ class Verification(
     val validateDt: LocalDateTime,
 
     @CreatedDate
-    val createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime? = null,
 
     @CreatedBy
-    val createdBy: String? = null,
+    var createdBy: String? = null,
 
     @LastModifiedDate
-    val updatedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
 
     @LastModifiedBy
-    val updatedBy: String? = null
+    var updatedBy: String? = null
 
 ) {
     companion object {

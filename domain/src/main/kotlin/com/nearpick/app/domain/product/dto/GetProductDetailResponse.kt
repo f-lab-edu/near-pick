@@ -1,8 +1,8 @@
-package com.nearpick.domain.product.dto
+package com.nearpick.app.domain.product.dto
 
-import com.nearpick.domain.brand.dto.BrandResponse
-import com.nearpick.domain.product.enum.ProductType
-import com.nearpick.domain.user.dto.UserResponse
+import com.nearpick.app.domain.brand.dto.BrandResponse
+import com.nearpick.app.domain.product.enum.ProductType
+import com.nearpick.app.domain.user.dto.UserResponse
 import java.math.BigInteger
 import java.time.LocalDateTime
 

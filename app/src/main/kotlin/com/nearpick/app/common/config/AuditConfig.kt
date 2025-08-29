@@ -11,10 +11,11 @@ import java.util.Optional
 @Configuration
 class AuditConfig() : AuditorAware<String> {
     override fun getCurrentAuditor(): Optional<String> {
-        return Optional.ofNullable(SecurityContextHolder.getContext())
+        val data = Optional.ofNullable(SecurityContextHolder.getContext())
             .map { it.authentication }
             .filter { it.isAuthenticated && !it.name.equals("anonymousUser") }
             .map { it.principal as UserPrincipal }
             .map { it.getUserId() }
+        return data
     }
 }

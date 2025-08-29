@@ -1,6 +1,6 @@
-package com.nearpick.domain.product.dto
+package com.nearpick.app.domain.product.dto
 
-import com.nearpick.domain.product.enum.ProductType
+import com.nearpick.app.domain.product.enum.ProductType
 import java.math.BigInteger
 import java.time.LocalDateTime
 

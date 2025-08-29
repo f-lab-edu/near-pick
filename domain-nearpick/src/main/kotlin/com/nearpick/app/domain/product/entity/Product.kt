@@ -1,11 +1,11 @@
-package com.nearpick.domain.product.entity
+package com.nearpick.app.domain.product.entity
 
-import com.nearpick.domain.brand.entity.Brand
-import com.nearpick.domain.product.dto.CreateProductRequest
-import com.nearpick.domain.product.dto.GetProductDetailResponse
-import com.nearpick.domain.product.dto.ProductResponse
-import com.nearpick.domain.product.enum.ProductType
-import com.nearpick.domain.user.entity.User
+import com.nearpick.app.domain.brand.entity.Brand
+import com.nearpick.app.domain.product.dto.CreateProductRequest
+import com.nearpick.app.domain.product.dto.GetProductDetailResponse
+import com.nearpick.app.domain.product.dto.ProductResponse
+import com.nearpick.app.domain.product.enum.ProductType
+import com.nearpick.app.domain.user.entity.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -57,16 +57,16 @@ class Product(
     var isActive: Boolean? = true,
 
     @CreatedDate
-    val createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime? = null,
 
     @CreatedBy
-    val createdBy: String? = null,
+    var createdBy: String? = null,
 
     @LastModifiedDate
-    val updatedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
 
     @LastModifiedBy
-    val updatedBy: String? = null
+    var updatedBy: String? = null
 ) {
     companion object {
         fun createBySeller(request: CreateProductRequest, user: User, brand: Brand): Product =
