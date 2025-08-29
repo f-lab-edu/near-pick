@@ -101,3 +101,22 @@ class InvalidPhoneNumberException(phoneNumber: String?) : BaseException(
     message = "올바르지 않은 핸드폰 번호 형식입니다. ($phoneNumber)",
     status = HttpStatus.BAD_REQUEST
 )
+
+// 가게 정보 관련 예외
+class InvalidBusinessRegistrationNumberException(businessRegistrationNumberNumber: String?) : BaseException(
+    code = "INVALID_BUSINESS_REGISTRATION_NUMBER",
+    message = "올바르지 않은 사업자 등록 번호 형식입니다. ($businessRegistrationNumberNumber)",
+    status = HttpStatus.BAD_REQUEST
+)
+
+class BrandNotFoundException(brandId: String?, userId: String?) : BaseException(
+    code = "BRAND_NOT_FOUND",
+    message = "사용자의 가게 정보가 잘못되었습니다. (userId=$userId, brandId=$brandId)",
+    status = HttpStatus.NOT_FOUND
+)
+
+class BrandAlreadyExistsException(brand: String) : BaseException(
+    code = "BRAND_ALREADY_EXISTS",
+    message = "이미 등록된 사업자 등록 번호입니다. (brand=$brand)",
+    status = HttpStatus.BAD_REQUEST
+)
