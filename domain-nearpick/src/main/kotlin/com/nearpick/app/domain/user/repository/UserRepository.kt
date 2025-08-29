@@ -1,0 +1,10 @@
+package com.nearpick.app.domain.user.repository
+
+import com.nearpick.app.domain.user.entity.User
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface UserRepository : JpaRepository<User, String> {
+    fun existsByEmail(email: String): Boolean
+    fun findByEmail(email: String): User?
+    fun existsByNickname(nickname: String): Boolean
+}
