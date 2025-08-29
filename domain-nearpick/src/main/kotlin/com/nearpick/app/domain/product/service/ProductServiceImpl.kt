@@ -11,7 +11,6 @@ import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.product.dto.UpdateProductRequest
 import com.nearpick.app.domain.product.entity.Product
 import com.nearpick.app.domain.product.repository.ProductRepository
-import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
