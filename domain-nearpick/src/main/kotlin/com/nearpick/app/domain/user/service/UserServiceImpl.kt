@@ -13,15 +13,18 @@ import com.nearpick.app.domain.user.dto.UpdateUserRequest
 import com.nearpick.app.domain.user.dto.UserResponse
 import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
+import jakarta.transaction.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-class UserServiceImpl(
+open class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
+
+    @Transactional
     override fun createUser(request: CreateUserRequest): UserResponse {
         checkEmail(request.email)
         checkNickname(request.nickname)
@@ -61,6 +64,7 @@ class UserServiceImpl(
         return User.toResponse(user)
     }
 
+    @Transactional
     override fun updateUser(id: String, request: UpdateUserRequest): UserResponse {
         val newEmail = request.email
         if (!newEmail.isNullOrBlank()) { checkEmail(newEmail) }
@@ -84,6 +88,7 @@ class UserServiceImpl(
         return User.toResponse(updatedUser)
     }
 
+    @Transactional
     override fun deleteUser(id: String) {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 

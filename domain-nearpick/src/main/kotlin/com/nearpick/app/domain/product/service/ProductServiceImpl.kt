@@ -13,16 +13,19 @@ import com.nearpick.app.domain.product.entity.Product
 import com.nearpick.app.domain.product.repository.ProductRepository
 import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-class ProductServiceImpl(
+open class ProductServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository,
     private val productRepository: ProductRepository
 ) : ProductService {
+
+    @Transactional
     override fun createProduct(request: CreateProductRequest, userId: String): ProductResponse {
         val brand = getBrand(request.brandId, userId)
         val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
@@ -43,6 +46,7 @@ class ProductServiceImpl(
         return Product.toDetailResponse(product)
     }
 
+    @Transactional
     override fun updateProduct(id: String, userId: String, request: UpdateProductRequest): ProductResponse {
         val product = getProduct(id, userId)
 
@@ -59,6 +63,7 @@ class ProductServiceImpl(
         return Product.toResponse(productRepository.save(updated))
     }
 
+    @Transactional
     override fun deleteProduct(id: String, userId: String) {
         val product = getProduct(id, userId)
 

@@ -9,17 +9,18 @@ import com.nearpick.app.common.exception.BrandNotFoundException
 import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
 import com.nearpick.app.domain.brand.dto.UpdateBrandRequest
-import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-class BrandServiceImpl(
+open class BrandServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository
 ) : BrandService {
+
+    @Transactional
     override fun createBrand(request: CreateBrandRequest, userId: String): BrandResponse {
         if (brandRepository.existsByBusinessRegistrationNumber(request.businessRegistrationNumber)) {
             throw BrandAlreadyExistsException(request.businessRegistrationNumber)
@@ -41,6 +42,7 @@ class BrandServiceImpl(
         return Brand.toDetailResponse(brand)
     }
 
+    @Transactional
     override fun updateBrand(id: String, userId: String, request: UpdateBrandRequest): BrandResponse {
         val brand = getBrand(id, userId)
 
@@ -58,6 +60,7 @@ class BrandServiceImpl(
         return Brand.toResponse(brandRepository.save(updated))
     }
 
+    @Transactional
     override fun deleteBrand(id: String, userId: String) {
         val brand = getBrand(id, userId)
 
