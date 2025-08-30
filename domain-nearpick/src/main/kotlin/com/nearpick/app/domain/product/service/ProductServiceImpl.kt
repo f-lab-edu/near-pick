@@ -3,7 +3,7 @@ package com.nearpick.app.domain.product.service
 import com.nearpick.app.common.exception.BrandNotFoundException
 import com.nearpick.app.common.exception.ProductNotFoundException
 import com.nearpick.app.common.exception.UserNotFoundException
-import com.nearpick.app.domain.brand.entity.Brand
+import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.brand.repository.BrandRepository
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
@@ -14,7 +14,6 @@ import com.nearpick.app.domain.product.repository.ProductRepository
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
@@ -70,10 +69,10 @@ open class ProductServiceImpl(
         productRepository.delete(product)
     }
 
-    private fun getBrand(brandId: String): Brand =
+    private fun getBrand(brandId: String): BrandEntity =
         brandRepository.findById(brandId).getOrElse { throw BrandNotFoundException(brandId, null) }
 
-    private fun getBrand(brandId: String, userId: String): Brand =
+    private fun getBrand(brandId: String, userId: String): BrandEntity =
         brandRepository.findByIdAndOwnerUserId(brandId, userId) ?: throw BrandNotFoundException(brandId, userId)
 
     private fun getProduct(id: String): Product =

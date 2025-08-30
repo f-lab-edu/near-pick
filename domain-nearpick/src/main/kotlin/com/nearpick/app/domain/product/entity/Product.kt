@@ -1,6 +1,6 @@
 package com.nearpick.app.domain.product.entity
 
-import com.nearpick.app.domain.brand.entity.Brand
+import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
@@ -39,7 +39,7 @@ class Product(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
-    val brand: Brand,
+    val brandEntity: BrandEntity,
 
     var name: String,
 
@@ -69,11 +69,11 @@ class Product(
     var updatedBy: String? = null
 ) {
     companion object {
-        fun createBySeller(request: CreateProductRequest, user: User, brand: Brand): Product =
+        fun createBySeller(request: CreateProductRequest, user: User, brandEntity: BrandEntity): Product =
             Product(
                 id = UUID.randomUUID().toString(),
                 seller = user,
-                brand = brand,
+                brandEntity = brandEntity,
                 name = request.name,
                 description = request.description,
                 price = request.price,
@@ -99,7 +99,7 @@ class Product(
             GetProductDetailResponse(
                 id = product.id,
                 seller = User.toResponse(product.seller),
-                brand = Brand.toResponse(product.brand),
+                brand = BrandEntity.toResponse(product.brandEntity),
                 name = product.name,
                 description = product.description,
                 price = product.price,

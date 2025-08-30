@@ -23,7 +23,7 @@ import java.util.UUID
 @Entity
 @Table(name = "Brand")
 @EntityListeners(AuditingEntityListener::class)
-class Brand(
+class BrandEntity(
     @Id
     @Column(name = "id", nullable = false, length = 255)
     val id: String,
@@ -63,8 +63,8 @@ class Brand(
     var updatedBy: String? = null
 ) {
     companion object {
-        fun createBySeller(request: CreateBrandRequest, user: User): Brand =
-            Brand(
+        fun createBySeller(request: CreateBrandRequest, user: User): BrandEntity =
+            BrandEntity(
                 id = UUID.randomUUID().toString(),
                 ownerUser = user,
                 name = request.name,
@@ -78,33 +78,33 @@ class Brand(
                 street = request.street
             )
 
-        fun toResponse(brand: Brand): BrandResponse =
+        fun toResponse(brandEntity: BrandEntity): BrandResponse =
             BrandResponse(
-                id = brand.id,
-                name = brand.name,
-                description = brand.description,
-                businessRegistrationNumber = brand.businessRegistrationNumber,
-                fullAddress = brand.fullAddress,
-                addressDetail = brand.addressDetail,
-                province = brand.province,
-                district = brand.district,
-                neighborhood = brand.neighborhood,
-                street = brand.street
+                id = brandEntity.id,
+                name = brandEntity.name,
+                description = brandEntity.description,
+                businessRegistrationNumber = brandEntity.businessRegistrationNumber,
+                fullAddress = brandEntity.fullAddress,
+                addressDetail = brandEntity.addressDetail,
+                province = brandEntity.province,
+                district = brandEntity.district,
+                neighborhood = brandEntity.neighborhood,
+                street = brandEntity.street
             )
 
-        fun toDetailResponse(brand: Brand): GetBrandDetailResponse =
+        fun toDetailResponse(brandEntity: BrandEntity): GetBrandDetailResponse =
             GetBrandDetailResponse(
-                id = brand.id,
-                ownerUser = User.toResponse(brand.ownerUser),
-                name = brand.name,
-                description = brand.description,
-                businessRegistrationNumber = brand.businessRegistrationNumber,
-                fullAddress = brand.fullAddress,
-                addressDetail = brand.addressDetail,
-                province = brand.province,
-                district = brand.district,
-                neighborhood = brand.neighborhood,
-                street = brand.street
+                id = brandEntity.id,
+                ownerUser = User.toResponse(brandEntity.ownerUser),
+                name = brandEntity.name,
+                description = brandEntity.description,
+                businessRegistrationNumber = brandEntity.businessRegistrationNumber,
+                fullAddress = brandEntity.fullAddress,
+                addressDetail = brandEntity.addressDetail,
+                province = brandEntity.province,
+                district = brandEntity.district,
+                neighborhood = brandEntity.neighborhood,
+                street = brandEntity.street
             )
     }
 }
