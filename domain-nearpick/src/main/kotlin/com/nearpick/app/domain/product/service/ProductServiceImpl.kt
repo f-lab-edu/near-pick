@@ -36,7 +36,7 @@ open class ProductServiceImpl(
     override fun findAllProductByBrand(brandId: String): List<ProductResponse> {
         val brand = getBrand(brandId)
 
-        return productRepository.findAllByBrand(brand).map { Product.toResponse(it) }
+        return productRepository.findAllByBrandEntity(brand).map { Product.toResponse(it) }
     }
 
     override fun findProductDetail(id: String): GetProductDetailResponse {

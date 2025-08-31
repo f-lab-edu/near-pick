@@ -15,16 +15,18 @@ import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 open class BrandServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository
 ) : BrandService {
 
-    @Transactional
     override fun createBrand(request: CreateBrandRequest, userId: String): BrandResponse {
+        val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
+
         val brand = Brand(
             name = request.name,
+            ownerUser = user,
             description = request.description,
             businessRegistrationNumber = request.businessRegistrationNumber,
             fullAddress = request.fullAddress,
@@ -39,30 +41,31 @@ open class BrandServiceImpl(
             throw BrandAlreadyExistsException(request.businessRegistrationNumber)
         }
 
-        val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
-        val seller = brand.toSellerEntity(user)
+        val seller = brand.toEntity()
         return BrandEntity.toResponse(brandRepository.save(seller))
     }
 
+    @Transactional(readOnly = true)
     override fun findAllBrandByOwnerUser(userId: String): List<BrandResponse> {
         return brandRepository.findAllByOwnerUserId(userId).map { BrandEntity.toResponse(it) }
     }
 
+    @Transactional(readOnly = true)
     override fun findBrandDetail(id: String): GetBrandDetailResponse {
         val brand = getBrand(id)
 
         return BrandEntity.toDetailResponse(brand)
     }
 
-    @Transactional
     override fun updateBrand(id: String, userId: String, request: UpdateBrandRequest): BrandResponse {
         val brandEntity = getBrand(id, userId)
         val brand = Brand.from(brandEntity)
+
         brand.update(request)
+
         return BrandEntity.toResponse(brandRepository.save(brand.toEntity()))
     }
 
-    @Transactional
     override fun deleteBrand(id: String, userId: String) {
         val brand = getBrand(id, userId)
 

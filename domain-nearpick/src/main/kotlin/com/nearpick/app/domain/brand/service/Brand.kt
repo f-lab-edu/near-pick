@@ -9,15 +9,16 @@ import java.util.UUID
 
 class Brand(
     val id: String? = null,
-    val name: String,
-    val description: String? = null,
+    val ownerUser: User,
+    var name: String,
+    var description: String? = null,
     val businessRegistrationNumber: String,
-    val fullAddress: String,
-    val addressDetail: String? = null,
-    val province: String? = null,
-    val district: String? = null,
-    val neighborhood: String? = null,
-    val street: String? = null
+    var fullAddress: String,
+    var addressDetail: String? = null,
+    var province: String? = null,
+    var district: String? = null,
+    var neighborhood: String? = null,
+    var street: String? = null
 ) {
     init {
         validateBusinessRegistrationNumber(businessRegistrationNumber)
@@ -29,10 +30,21 @@ class Brand(
         }
     }
 
-    fun toSellerEntity(user: User): BrandEntity {
+    fun update(request: UpdateBrandRequest) {
+        this.name = request.name ?: this.name
+        this.description = request.description ?: this.description
+        this.fullAddress = request.fullAddress ?: this.fullAddress
+        this.addressDetail = request.addressDetail ?: this.addressDetail
+        this.province = request.province ?: this.province
+        this.district = request.district ?: this.district
+        this.neighborhood = request.neighborhood ?: this.neighborhood
+        this.street = request.street ?: this.street
+    }
+
+    fun toEntity(): BrandEntity {
         return BrandEntity(
-            id = UUID.randomUUID().toString(),
-            ownerUser = user,
+            id = id?: UUID.randomUUID().toString(),
+            ownerUser = ownerUser,
             name = name,
             description = description,
             businessRegistrationNumber = businessRegistrationNumber,
@@ -45,18 +57,11 @@ class Brand(
         )
     }
 
-    fun update(request: UpdateBrandRequest) {
-        validateBusinessRegistrationNumber(request.busineessNumber)
-    }
-
-    fun toEntity(): BrandEntity {
-        TODO("Not yet implemented")
-    }
-
     companion object {
         fun from(brandEntity: BrandEntity): Brand {
             return Brand(
                 id = brandEntity.id,
+                ownerUser = brandEntity.ownerUser,
                 name = brandEntity.name,
                 description = brandEntity.description,
                 businessRegistrationNumber = brandEntity.businessRegistrationNumber,
