@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 open class VerificationServiceImpl(
     private val repository: VerificationRepository,
     private val emailSender: EmailSender
@@ -23,7 +23,6 @@ open class VerificationServiceImpl(
 
     private val EXPIRATION_MINUTES = 10L
 
-    @Transactional
     override fun sendVerificationCode(type: VerificationType, email: String, subject: String) {
         val token = generateToken()
 
@@ -34,7 +33,6 @@ open class VerificationServiceImpl(
         emailSender.send(email, subject, content)
     }
 
-    @Transactional
     override fun verifyCode(type: VerificationType, email: String, token: String): Boolean {
         val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type.name, email)
             ?: throw InvalidEmailVerificationRequestException(email)
@@ -67,7 +65,6 @@ open class VerificationServiceImpl(
         }
     }
 
-    @Transactional
     override fun isVerifyEmail(type: VerificationType, email: String): Boolean {
         val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type.name, email)
             ?: throw InvalidEmailVerificationRequestException(email)

@@ -10,22 +10,22 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 open class UserAddressServiceImpl(
     private val userAddressRepository: UserAddressRepository
 ) : UserAddressService {
 
-    @Transactional
+
     override fun createUserAddress(request: CreateUserAddressRequest, userId: String): UserAddressResponse {
         val entity = UserAddress.createByUser(request, userId)
         return UserAddress.toResponse(userAddressRepository.save(entity))
     }
 
+    @Transactional(readOnly = true)
     override fun findAllUserAddressByUserId(userId: String): List<UserAddressResponse> {
         return userAddressRepository.findAllByUserId(userId).map { UserAddress.toResponse(it) }
     }
 
-    @Transactional
     override fun updateUserAddress(id: String, userId: String, req: UpdateUserAddressRequest): UserAddressResponse {
         val address =
             userAddressRepository.findByIdAndUserId(id, userId) ?: throw UserAddressNotFoundException(id, userId)
@@ -41,7 +41,6 @@ open class UserAddressServiceImpl(
         return UserAddress.toResponse(userAddressRepository.save(updated))
     }
 
-    @Transactional
     override fun deleteUserAddress(id: String, userId: String) {
         val address = userAddressRepository.findByIdAndUserId(id, userId) ?: throw UserAddressNotFoundException(
             id,

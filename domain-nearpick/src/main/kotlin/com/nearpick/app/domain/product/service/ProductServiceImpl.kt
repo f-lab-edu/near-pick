@@ -17,14 +17,13 @@ import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 open class ProductServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository,
     private val productRepository: ProductRepository
 ) : ProductService {
 
-    @Transactional
     override fun createProduct(request: CreateProductRequest, userId: String): ProductResponse {
         val brand = getBrand(request.brandId, userId)
         val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
@@ -33,19 +32,20 @@ open class ProductServiceImpl(
         return Product.toResponse(productRepository.save(entity))
     }
 
+    @Transactional(readOnly = true)
     override fun findAllProductByBrand(brandId: String): List<ProductResponse> {
         val brand = getBrand(brandId)
 
         return productRepository.findAllByBrandEntity(brand).map { Product.toResponse(it) }
     }
 
+    @Transactional(readOnly = true)
     override fun findProductDetail(id: String): GetProductDetailResponse {
         val product = getProduct(id)
 
         return Product.toDetailResponse(product)
     }
 
-    @Transactional
     override fun updateProduct(id: String, userId: String, request: UpdateProductRequest): ProductResponse {
         val product = getProduct(id, userId)
 
@@ -62,7 +62,6 @@ open class ProductServiceImpl(
         return Product.toResponse(productRepository.save(updated))
     }
 
-    @Transactional
     override fun deleteProduct(id: String, userId: String) {
         val product = getProduct(id, userId)
 

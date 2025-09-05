@@ -19,13 +19,12 @@ import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 open class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
 
-    @Transactional
     override fun createUser(request: CreateUserRequest): UserResponse {
         checkEmail(request.email)
         checkNickname(request.nickname)
@@ -41,6 +40,7 @@ open class UserServiceImpl(
         return User.toResponse(createdUser)
     }
 
+    @Transactional(readOnly = true)
     override fun checkEmail(email: String) {
         if (Validator.isValidEmail(email)) {
             throw InvalidFormatEmailException(email)
@@ -50,6 +50,7 @@ open class UserServiceImpl(
         }
     }
 
+    @Transactional(readOnly = true)
     override fun checkNickname(nickname: String) {
         if (!Validator.isValidNickname(nickname)) {
             throw InvalidFormatNicknameException(nickname)
@@ -59,13 +60,13 @@ open class UserServiceImpl(
         }
     }
 
+    @Transactional(readOnly = true)
     override fun getUserById(id: String): UserResponse {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
         return User.toResponse(user)
     }
 
-    @Transactional
     override fun updateUser(id: String, request: UpdateUserRequest): UserResponse {
         val newEmail = request.email
         if (!newEmail.isNullOrBlank()) { checkEmail(newEmail) }
@@ -89,7 +90,6 @@ open class UserServiceImpl(
         return User.toResponse(updatedUser)
     }
 
-    @Transactional
     override fun deleteUser(id: String) {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
