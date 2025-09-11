@@ -30,7 +30,7 @@ import java.util.UUID
 @Entity
 @Table(name = "Product")
 @EntityListeners(AuditingEntityListener::class)
-class Product(
+class ProductEntity(
     @Id
     @Column(name = "id", nullable = false, length = 255)
     val id: String,
@@ -69,46 +69,4 @@ class Product(
 
     @LastModifiedBy
     var updatedBy: String? = null
-) {
-    companion object {
-        fun createBySeller(request: CreateProductRequest, userEntity: UserEntity, brandEntity: BrandEntity): Product =
-            Product(
-                id = UUID.randomUUID().toString(),
-                seller = userEntity,
-                brandEntity = brandEntity,
-                name = request.name,
-                description = request.description,
-                price = request.price,
-                stock = request.stock,
-                productType = request.productType,
-                reservationDeadline = request.reservationDeadline,
-                isActive = request.isActive ?: true
-            )
-
-        fun toResponse(product: Product): ProductResponse =
-            ProductResponse(
-                id = product.id,
-                name = product.name,
-                description = product.description,
-                price = product.price,
-                stock = product.stock,
-                productType = product.productType,
-                reservationDeadline = product.reservationDeadline,
-                isActive = product.isActive
-            )
-
-        fun toDetailResponse(product: Product): GetProductDetailResponse =
-            GetProductDetailResponse(
-                id = product.id,
-                seller = User.toResponse(product.seller),
-                brand = Brand.toResponse(product.brandEntity),
-                name = product.name,
-                description = product.description,
-                price = product.price,
-                stock = product.stock,
-                productType = product.productType,
-                reservationDeadline = product.reservationDeadline,
-                isActive = product.isActive
-            )
-    }
-}
+)

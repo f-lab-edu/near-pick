@@ -41,8 +41,7 @@ open class BrandServiceImpl(
             throw BrandAlreadyExistsException(request.businessRegistrationNumber)
         }
 
-        val seller = brand.toEntity()
-        return Brand.toResponse(brandRepository.save(seller))
+        return Brand.toResponse(brandRepository.save(brand.toEntity()))
     }
 
     @Transactional(readOnly = true)
