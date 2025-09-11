@@ -34,7 +34,7 @@ open class VerificationServiceImpl(
     }
 
     override fun verifyCode(type: VerificationType, email: String, token: String): Boolean {
-        val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type.name, email)
+        val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type, email)
             ?: throw InvalidEmailVerificationRequestException(email)
 
         return when {
@@ -66,7 +66,7 @@ open class VerificationServiceImpl(
     }
 
     override fun isVerifyEmail(type: VerificationType, email: String): Boolean {
-        val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type.name, email)
+        val verification = repository.findTopByTypeAndNameOrderByCreatedAtDesc(type, email)
             ?: throw InvalidEmailVerificationRequestException(email)
 
         return when {

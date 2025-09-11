@@ -29,7 +29,7 @@ class VerificationServiceTest : StringSpec({
         val expired = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "123456", -10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(expired)
 
         `when`(verificationRepository.save(any(VerificationEntity::class.java))).thenAnswer { it.arguments[0] }
@@ -52,7 +52,7 @@ class VerificationServiceTest : StringSpec({
         )
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(verified)
 
         shouldThrow<InvalidEmailVerificationException> {
@@ -65,7 +65,7 @@ class VerificationServiceTest : StringSpec({
         val pending = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "654321", 10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(pending)
 
         `when`(verificationRepository.save(any(VerificationEntity::class.java))).thenAnswer { it.arguments[0] }
@@ -82,7 +82,7 @@ class VerificationServiceTest : StringSpec({
         val ok = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "123456", 10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(ok)
 
         `when`(verificationRepository.save(any(VerificationEntity::class.java))).thenAnswer { it.arguments[0] }
@@ -98,7 +98,7 @@ class VerificationServiceTest : StringSpec({
         val pending = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "123456", 10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(pending)
 
         shouldThrow<InvalidEmailVerificationException> {
@@ -118,7 +118,7 @@ class VerificationServiceTest : StringSpec({
         )
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(late)
 
         shouldThrow<InvalidEmailVerificationTimeException> {
