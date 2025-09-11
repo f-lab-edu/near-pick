@@ -2,9 +2,9 @@ package com.nearpick.app.domain.auth
 
 import com.nearpick.app.common.exception.InvalidEmailException
 import com.nearpick.app.common.exception.InvalidPasswordException
-import com.nearpick.app.common.security.JwtTokenProvider
 import com.nearpick.app.domain.auth.dto.LoginRequest
 import com.nearpick.app.domain.auth.dto.LoginResponse
+import com.nearpick.app.domain.auth.port.JwtTokenProvider
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -24,6 +24,6 @@ class AuthServiceImpl(
         }
 
         val token = jwtTokenProvider.generateToken(user.id, user.role.name)
-        return LoginResponse(accessToken = token)
+        return LoginResponse(token)
     }
 }

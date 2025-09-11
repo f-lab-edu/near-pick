@@ -1,5 +1,6 @@
 package com.nearpick.app.common.security.config
 
+import com.nearpick.app.common.security.JwtProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
