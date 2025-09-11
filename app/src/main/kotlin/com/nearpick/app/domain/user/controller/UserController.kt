@@ -43,7 +43,7 @@ class UserController(
 
     @Operation(summary = "사용자 조회", description = "ID로 사용자 정보를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 조회 성공")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
     @GetMapping("/{id}")
     fun getUserById(@PathVariable id: String): ResponseEntity<Response<UserResponse>> {
         val user = userService.getUserById(id)
@@ -80,7 +80,7 @@ class UserController(
 
     @Operation(summary = "사용자 수정", description = "사용자 정보를 수정합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 수정 성공")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
     @PutMapping("/{id}")
     fun updateUser(
         @PathVariable id: String,
@@ -97,7 +97,7 @@ class UserController(
 
     @Operation(summary = "사용자 삭제", description = "사용자를 삭제 처리합니다.")
     @ApiResponse(responseCode = "200", description = "사용자 삭제 성공")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.id")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.userId")
     @DeleteMapping("/{id}")
     fun deleteUser(@PathVariable id: String): ResponseEntity<Response<String>> {
         userService.deleteUser(id)

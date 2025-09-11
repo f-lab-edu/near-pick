@@ -1,10 +1,9 @@
 package com.nearpick.app.domain.address.repository
 
-import com.nearpick.app.domain.address.entity.UserAddress
+import com.nearpick.app.domain.address.entity.UserAddressEntity
 import org.springframework.data.jpa.repository.JpaRepository
-import java.util.*
 
-interface UserAddressRepository : JpaRepository<UserAddress, String> {
-    fun findAllByUserId(userId: String): List<UserAddress>
-    fun findByIdAndUserId(id: String, userId: String): UserAddress?
+interface UserAddressRepository : JpaRepository<UserAddressEntity, String> {
+    fun findAllByUserId(userId: String): List<UserAddressEntity>
+    fun findByIdAndUserId(id: String, userId: String): UserAddressEntity?
 }

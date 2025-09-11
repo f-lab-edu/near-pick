@@ -12,7 +12,16 @@ class AddressSearchServiceImpl(
     override fun searchAddress(query: String): List<SearchAddressResponse>? {
         val kakaoResults = kakaoAddressClient.searchAddress(query)
         kakaoResults.onSuccess {
-            return SearchAddressResponse.toDtoList(it)
+            return it.map {
+                SearchAddressResponse(
+                    fullAddress = it.address?.address_name ?: it.road_address?.address_name,
+                    province = it.address?.region_1depth_name,
+                    district = it.address?.region_2depth_name,
+                    neighborhood = it.address?.region_3depth_name,
+                    street = it.road_address?.road_name,
+                    buildingNumber = it.road_address?.main_building_no
+                )
+            }
         }.onFailure { exception -> throw ExternalApiException(exception.message) }
         return null
     }

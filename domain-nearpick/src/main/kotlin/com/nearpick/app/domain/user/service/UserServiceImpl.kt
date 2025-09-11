@@ -11,21 +11,22 @@ import com.nearpick.app.common.validator.Validator
 import com.nearpick.app.domain.user.dto.CreateUserRequest
 import com.nearpick.app.domain.user.dto.UpdateUserRequest
 import com.nearpick.app.domain.user.dto.UserResponse
-import com.nearpick.app.domain.user.entity.User
+import com.nearpick.app.domain.user.entity.UserEntity
 import com.nearpick.app.domain.user.repository.UserRepository
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-class UserServiceImpl(
+@Transactional(readOnly = false)
+open class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
-    override fun createUser(request: CreateUserRequest): UserResponse {
-        checkEmail(request.email)
-        checkNickname(request.nickname)
 
+    override fun createUser(request: CreateUserRequest): UserResponse {
         val parsedRole = Role.from(request.role)
         if (parsedRole == Role.ADMIN) {
             throw InvalidRoleException("ADMIN은 직접 등록할 수 없습니다.")
@@ -33,10 +34,26 @@ class UserServiceImpl(
 
         val encryptedPassword = passwordEncoder.encode(request.password)
 
-        val createdUser = userRepository.save(User.toEntity(request, parsedRole, encryptedPassword))
-        return User.toResponse(createdUser)
+        val user = User(
+            email = request.email,
+            nickname = request.nickname,
+            password = encryptedPassword,
+            profileImageUrl = request.profileImageUrl,
+            phoneNumber = request.phoneNumber,
+            role = parsedRole,
+            accountHolderName = request.accountHolderName,
+            bankName = request.bankName,
+            accountNumber = request.accountNumber
+        )
+
+        checkEmail(request.email)
+        checkNickname(request.nickname)
+
+        val createdUserEntity = user.toEntity()
+        return User.toResponse(userRepository.save(createdUserEntity))
     }
 
+    @Transactional(readOnly = true)
     override fun checkEmail(email: String) {
         if (Validator.isValidEmail(email)) {
             throw InvalidFormatEmailException(email)
@@ -46,6 +63,7 @@ class UserServiceImpl(
         }
     }
 
+    @Transactional(readOnly = true)
     override fun checkNickname(nickname: String) {
         if (!Validator.isValidNickname(nickname)) {
             throw InvalidFormatNicknameException(nickname)
@@ -55,6 +73,7 @@ class UserServiceImpl(
         }
     }
 
+    @Transactional(readOnly = true)
     override fun getUserById(id: String): UserResponse {
         val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
@@ -68,20 +87,13 @@ class UserServiceImpl(
         val newNickname = request.nickname
         if (!newNickname.isNullOrBlank()) { checkNickname(newNickname) }
 
-        val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
+        val userEntity = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
-        user.apply {
-            email = request.email ?: email
-            nickname = request.nickname ?: nickname
-            profileImageUrl = request.profileImageUrl ?: profileImageUrl
-            phoneNumber = request.phoneNumber ?: phoneNumber
-            accountHolderName = request.accountHolderName ?: accountHolderName
-            bankName = request.bankName ?: bankName
-            accountNumber = request.accountNumber ?: accountNumber
-        }
+        val user = User.from(userEntity)
 
-        val updatedUser = userRepository.save(user)
-        return User.toResponse(updatedUser)
+        user.update(request)
+
+        return User.toResponse(userRepository.save(user.toEntity()))
     }
 
     override fun deleteUser(id: String) {

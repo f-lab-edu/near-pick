@@ -3,40 +3,53 @@ package com.nearpick.app.domain.product.service
 import com.nearpick.app.common.exception.BrandNotFoundException
 import com.nearpick.app.common.exception.ProductNotFoundException
 import com.nearpick.app.common.exception.UserNotFoundException
-import com.nearpick.app.domain.brand.entity.Brand
+import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.brand.repository.BrandRepository
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.product.dto.UpdateProductRequest
-import com.nearpick.app.domain.product.entity.Product
+import com.nearpick.app.domain.product.entity.ProductEntity
 import com.nearpick.app.domain.product.repository.ProductRepository
-import com.nearpick.app.domain.user.entity.User
 import com.nearpick.app.domain.user.repository.UserRepository
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
-class ProductServiceImpl(
+@Transactional(readOnly = false)
+open class ProductServiceImpl(
     private val userRepository: UserRepository,
     private val brandRepository: BrandRepository,
     private val productRepository: ProductRepository
 ) : ProductService {
+
     override fun createProduct(request: CreateProductRequest, userId: String): ProductResponse {
         val brand = getBrand(request.brandId, userId)
         val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
-        val entity = Product.createBySeller(request, user, brand)
 
-        return Product.toResponse(productRepository.save(entity))
+        val product = Product(
+            seller = user,
+            brandEntity = brand,
+            name = request.name,
+            description = request.description,
+            price = request.price,
+            stock = request.stock,
+            productType = request.productType,
+            reservationDeadline = request.reservationDeadline
+        )
+
+        return Product.toResponse(productRepository.save(product.toEntity()))
     }
 
+    @Transactional(readOnly = true)
     override fun findAllProductByBrand(brandId: String): List<ProductResponse> {
         val brand = getBrand(brandId)
 
-        return productRepository.findAllByBrand(brand).map { Product.toResponse(it) }
+        return productRepository.findAllByBrandEntity(brand).map { Product.toResponse(it) }
     }
 
+    @Transactional(readOnly = true)
     override fun findProductDetail(id: String): GetProductDetailResponse {
         val product = getProduct(id)
 
@@ -44,19 +57,12 @@ class ProductServiceImpl(
     }
 
     override fun updateProduct(id: String, userId: String, request: UpdateProductRequest): ProductResponse {
-        val product = getProduct(id, userId)
+        val productEntity = getProduct(id, userId)
+        val product = Product.from(productEntity)
 
-        val updated = product.apply {
-            name = request.name ?: name
-            description = request.description ?: description
-            price = request.price ?: price
-            stock = request.stock ?: stock
-            productType = request.productType ?: productType
-            reservationDeadline = request.reservationDeadline ?: reservationDeadline
-            isActive = request.isActive ?: isActive
-        }
+        product.update(request)
 
-        return Product.toResponse(productRepository.save(updated))
+        return Product.toResponse(productRepository.save(product.toEntity()))
     }
 
     override fun deleteProduct(id: String, userId: String) {
@@ -65,16 +71,16 @@ class ProductServiceImpl(
         productRepository.delete(product)
     }
 
-    private fun getBrand(brandId: String): Brand =
+    private fun getBrand(brandId: String): BrandEntity =
         brandRepository.findById(brandId).getOrElse { throw BrandNotFoundException(brandId, null) }
 
-    private fun getBrand(brandId: String, userId: String): Brand =
-        brandRepository.findByIdAndOwnerUserId(brandId, userId) ?: throw BrandNotFoundException(brandId, userId)
+    private fun getBrand(brandId: String, userId: String): BrandEntity =
+        brandRepository.findByIdAndOwnerUserEntityId(brandId, userId) ?: throw BrandNotFoundException(brandId, userId)
 
-    private fun getProduct(id: String): Product =
+    private fun getProduct(id: String): ProductEntity =
         productRepository.findById(id).orElse(null)
             ?: throw ProductNotFoundException(id, null)
 
-    private fun getProduct(id: String, userId: String): Product =
+    private fun getProduct(id: String, userId: String): ProductEntity =
         productRepository.findByIdAndSellerId(id, userId) ?: throw ProductNotFoundException(id, userId)
 }

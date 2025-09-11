@@ -1,11 +1,13 @@
 package com.nearpick.app.domain.product.entity
 
-import com.nearpick.app.domain.brand.entity.Brand
+import com.nearpick.app.domain.brand.entity.BrandEntity
+import com.nearpick.app.domain.brand.service.Brand
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.product.enum.ProductType
-import com.nearpick.app.domain.user.entity.User
+import com.nearpick.app.domain.user.entity.UserEntity
+import com.nearpick.app.domain.user.service.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -28,18 +30,18 @@ import java.util.UUID
 @Entity
 @Table(name = "Product")
 @EntityListeners(AuditingEntityListener::class)
-class Product(
+class ProductEntity(
     @Id
     @Column(name = "id", nullable = false, length = 255)
     val id: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
-    val seller: User,
+    val seller: UserEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
-    val brand: Brand,
+    val brandEntity: BrandEntity,
 
     var name: String,
 
@@ -67,46 +69,4 @@ class Product(
 
     @LastModifiedBy
     var updatedBy: String? = null
-) {
-    companion object {
-        fun createBySeller(request: CreateProductRequest, user: User, brand: Brand): Product =
-            Product(
-                id = UUID.randomUUID().toString(),
-                seller = user,
-                brand = brand,
-                name = request.name,
-                description = request.description,
-                price = request.price,
-                stock = request.stock,
-                productType = request.productType,
-                reservationDeadline = request.reservationDeadline,
-                isActive = request.isActive ?: true
-            )
-
-        fun toResponse(product: Product): ProductResponse =
-            ProductResponse(
-                id = product.id,
-                name = product.name,
-                description = product.description,
-                price = product.price,
-                stock = product.stock,
-                productType = product.productType,
-                reservationDeadline = product.reservationDeadline,
-                isActive = product.isActive
-            )
-
-        fun toDetailResponse(product: Product): GetProductDetailResponse =
-            GetProductDetailResponse(
-                id = product.id,
-                seller = User.toResponse(product.seller),
-                brand = Brand.toResponse(product.brand),
-                name = product.name,
-                description = product.description,
-                price = product.price,
-                stock = product.stock,
-                productType = product.productType,
-                reservationDeadline = product.reservationDeadline,
-                isActive = product.isActive
-            )
-    }
-}
+)

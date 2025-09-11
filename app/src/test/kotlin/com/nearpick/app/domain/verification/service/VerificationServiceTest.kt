@@ -4,7 +4,7 @@ import com.nearpick.app.common.exception.InvalidEmailVerificationException
 import com.nearpick.app.common.exception.InvalidEmailVerificationTimeException
 import com.nearpick.app.common.exception.InvalidEmailVerificationTokenException
 import com.nearpick.app.common.mail.EmailSender
-import com.nearpick.app.domain.verification.entity.Verification
+import com.nearpick.app.domain.verification.entity.VerificationEntity
 import com.nearpick.app.domain.verification.enum.VerificationStatus
 import com.nearpick.app.domain.verification.enum.VerificationType
 import com.nearpick.app.domain.verification.repository.VerificationRepository
@@ -26,33 +26,33 @@ class VerificationServiceTest : StringSpec({
 
     "만료 시간이 지난 경우 InvalidEmailVerificationTimeException을 발생한다." {
         val email = "user@example.com"
-        val expired = Verification.from(VerificationType.SIGNUP_EMAIL.name, email, "123456", -10L)
+        val expired = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "123456", -10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(expired)
 
-        `when`(verificationRepository.save(any(Verification::class.java))).thenAnswer { it.arguments[0] }
+        `when`(verificationRepository.save(any(VerificationEntity::class.java))).thenAnswer { it.arguments[0] }
 
         shouldThrow<InvalidEmailVerificationTimeException> {
             verificationService.verifyCode(VerificationType.SIGNUP_EMAIL, email, expired.token)
         }
-        expired.status shouldBe VerificationStatus.EXPIRED.name
+        expired.status shouldBe VerificationStatus.EXPIRED
     }
 
     "PENDING으로 저장되어있지 않은 경우 이미 검증이 완료된 상태이므로 InvalidEmailVerificationException을 발생한다." {
         val email = "user@example.com"
-        val verified = Verification(
+        val verified = VerificationEntity(
             id = UUID.randomUUID().toString(),
-            type = VerificationType.SIGNUP_EMAIL.name,
+            type = VerificationType.SIGNUP_EMAIL,
             name = email,
             token = "123456",
-            status = VerificationStatus.VERIFIED.name,
+            status = VerificationStatus.VERIFIED,
             validateDt = LocalDateTime.now().plusMinutes(10L)
         )
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(verified)
 
         shouldThrow<InvalidEmailVerificationException> {
@@ -62,43 +62,43 @@ class VerificationServiceTest : StringSpec({
 
     "토큰 값이 틀린 경우 InvalidEmailVerificationTokenException을 발생한다" {
         val email = "user@example.com"
-        val pending = Verification.from(VerificationType.SIGNUP_EMAIL.name, email, "654321", 10L)
+        val pending = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "654321", 10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(pending)
 
-        `when`(verificationRepository.save(any(Verification::class.java))).thenAnswer { it.arguments[0] }
+        `when`(verificationRepository.save(any(VerificationEntity::class.java))).thenAnswer { it.arguments[0] }
 
         shouldThrow<InvalidEmailVerificationTokenException> {
             verificationService.verifyCode(VerificationType.SIGNUP_EMAIL, email, "123456")
         }
 
-        pending.status shouldBe VerificationStatus.FAILED.name
+        pending.status shouldBe VerificationStatus.FAILED
     }
 
     "토큰과 인증 정보가 모두 유효한 경우 true를 반환한다." {
         val email = "user@example.com"
-        val ok = Verification.from(VerificationType.SIGNUP_EMAIL.name, email, "123456", 10L)
+        val ok = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "123456", 10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(ok)
 
-        `when`(verificationRepository.save(any(Verification::class.java))).thenAnswer { it.arguments[0] }
+        `when`(verificationRepository.save(any(VerificationEntity::class.java))).thenAnswer { it.arguments[0] }
 
         val result = verificationService.verifyCode(VerificationType.SIGNUP_EMAIL, email, "123456")
         result shouldBe true
-        ok.status shouldBe VerificationStatus.VERIFIED.name
-        verify(verificationRepository, atLeastOnce()).save(any(Verification::class.java))
+        ok.status shouldBe VerificationStatus.VERIFIED
+        verify(verificationRepository, atLeastOnce()).save(any(VerificationEntity::class.java))
     }
 
     "회원가입, 이메일 수정을 위해 인증 정보를 확인할 때 인증 정보가 유효한 상태가 아닐 경우 InvalidEmailVerificationException을 발생한다." {
         val email = "user@example.com"
-        val pending = Verification.from(VerificationType.SIGNUP_EMAIL.name, email, "123456", 10L)
+        val pending = VerificationEntity.from(VerificationType.SIGNUP_EMAIL, email, "123456", 10L)
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(pending)
 
         shouldThrow<InvalidEmailVerificationException> {
@@ -108,17 +108,17 @@ class VerificationServiceTest : StringSpec({
 
     "회원가입, 이메일 수정을 위해 인증 정보를 확인할 때 인증 정보가 유효해도 만료 시간이 지난 경우 InvalidEmailVerificationTimeException을 발생한다." {
         val email = "user@example.com"
-        val late = Verification(
+        val late = VerificationEntity(
             id = UUID.randomUUID().toString(),
-            type = VerificationType.SIGNUP_EMAIL.name,
+            type = VerificationType.SIGNUP_EMAIL,
             name = email,
             token = "123456",
-            status = VerificationStatus.VERIFIED.name,
+            status = VerificationStatus.VERIFIED,
             validateDt = LocalDateTime.now().minusSeconds(1)
         )
 
         `when`(
-            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL.name, email)
+            verificationRepository.findTopByTypeAndNameOrderByCreatedAtDesc(VerificationType.SIGNUP_EMAIL, email)
         ).thenReturn(late)
 
         shouldThrow<InvalidEmailVerificationTimeException> {

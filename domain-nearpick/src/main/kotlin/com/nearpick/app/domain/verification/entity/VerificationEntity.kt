@@ -1,9 +1,12 @@
 package com.nearpick.app.domain.verification.entity
 
 import com.nearpick.app.domain.verification.enum.VerificationStatus
+import com.nearpick.app.domain.verification.enum.VerificationType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedBy
@@ -17,12 +20,13 @@ import java.util.UUID
 @Entity
 @Table(name = "verification")
 @EntityListeners(AuditingEntityListener::class)
-class Verification(
+class VerificationEntity(
     @Id
     @Column(nullable = false)
-    val id: String, // UUID
+    val id: String,
 
-    val type: String?, // SIGNUP_EMAIL, UPDATE_USER_EMAIL
+    @Enumerated(EnumType.STRING)
+    val type: VerificationType?,
 
     val userId: String? = null,
 
@@ -32,7 +36,8 @@ class Verification(
     @Column(nullable = false)
     val token: String,
 
-    var status: String? = null, // PENDING, VERIFIED, EXPIRED, FAILED
+    @Enumerated(EnumType.STRING)
+    var status: VerificationStatus? = null,
 
     @Column(nullable = false)
     val validateDt: LocalDateTime,
@@ -51,13 +56,13 @@ class Verification(
 
 ) {
     companion object {
-        fun from(type: String, name: String, token: String, expirationMinutes: Long): Verification {
-            return Verification(
+        fun from(type: VerificationType, name: String, token: String, expirationMinutes: Long): VerificationEntity {
+            return VerificationEntity(
                 id = UUID.randomUUID().toString(),
                 type = type,
                 name = name,
                 token = token,
-                status = VerificationStatus.PENDING.name,
+                status = VerificationStatus.PENDING,
                 validateDt = LocalDateTime.now().plusMinutes(expirationMinutes)
             )
         }
