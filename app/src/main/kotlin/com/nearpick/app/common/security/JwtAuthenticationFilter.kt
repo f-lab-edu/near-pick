@@ -1,6 +1,6 @@
 package com.nearpick.app.common.security
 
-import com.nearpick.app.domain.auth.CustomUserDetailsService
+import com.nearpick.app.common.security.principal.CustomUserDetailsService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

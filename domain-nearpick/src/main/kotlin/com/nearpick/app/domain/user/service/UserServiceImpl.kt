@@ -8,13 +8,14 @@ import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.common.exception.InvalidFormatNicknameException
 import com.nearpick.app.common.exception.NicknameAlreadyExistsException
 import com.nearpick.app.common.validator.Validator
+import com.nearpick.app.domain.auth.port.PasswordMatcher
 import com.nearpick.app.domain.user.dto.CreateUserRequest
 import com.nearpick.app.domain.user.dto.UpdateUserRequest
+import com.nearpick.app.domain.user.dto.UserPrincipalResponse
 import com.nearpick.app.domain.user.dto.UserResponse
 import com.nearpick.app.domain.user.entity.UserEntity
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
@@ -23,8 +24,14 @@ import kotlin.jvm.optionals.getOrElse
 @Transactional(readOnly = false)
 open class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordMatcher: PasswordMatcher
 ) : UserService {
+    override fun loadUserByUsername(id: String): UserPrincipalResponse {
+        val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
+
+        return User.toPrincipalResponse(user)
+
+    }
 
     override fun createUser(request: CreateUserRequest): UserResponse {
         val parsedRole = Role.from(request.role)
@@ -32,7 +39,7 @@ open class UserServiceImpl(
             throw InvalidRoleException("ADMIN은 직접 등록할 수 없습니다.")
         }
 
-        val encryptedPassword = passwordEncoder.encode(request.password)
+        val encryptedPassword = passwordMatcher.encode(request.password)
 
         val user = User(
             email = request.email,

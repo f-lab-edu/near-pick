@@ -2,8 +2,8 @@ package com.nearpick.app.common.security
 
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.security.config.WebSecurityConfig
-import com.nearpick.app.common.user.UserPrincipal
-import com.nearpick.app.domain.auth.CustomUserDetailsServiceImpl
+import com.nearpick.app.common.security.principal.CustomUserDetailsService
+import com.nearpick.app.common.security.principal.UserPrincipal
 import com.nearpick.app.domain.test.controller.TestController
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,7 +31,7 @@ class JwtAuthenticationFilterTest(
     lateinit var jwtTokenProviderAdapter: JwtTokenProviderAdapter
 
     @MockitoBean
-    lateinit var userDetailsService: CustomUserDetailsServiceImpl
+    lateinit var userDetailsService: CustomUserDetailsService
 
     @Test
     fun `토큰이 없으면 SecurityContext에 인증 정보가 없어야 한다`() {

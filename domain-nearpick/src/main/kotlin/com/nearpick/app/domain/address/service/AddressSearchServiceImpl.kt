@@ -1,16 +1,16 @@
 package com.nearpick.app.domain.address.service
 
 import com.nearpick.app.common.exception.ExternalApiException
-import com.nearpick.app.domain.address.client.KakaoAddressClient
+import com.nearpick.app.domain.address.client.AddressClient
 import com.nearpick.app.domain.address.dto.SearchAddressResponse
 import org.springframework.stereotype.Service
 
 @Service
 class AddressSearchServiceImpl(
-    private val kakaoAddressClient: KakaoAddressClient
+    private val addressClient: AddressClient
 ) : AddressSearchService {
     override fun searchAddress(query: String): List<SearchAddressResponse>? {
-        val kakaoResults = kakaoAddressClient.searchAddress(query)
+        val kakaoResults = addressClient.searchAddress(query)
         kakaoResults.onSuccess {
             return it.map {
                 SearchAddressResponse(
