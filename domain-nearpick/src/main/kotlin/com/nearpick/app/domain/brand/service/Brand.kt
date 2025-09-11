@@ -2,14 +2,17 @@ package com.nearpick.app.domain.brand.service
 
 import com.nearpick.app.common.exception.InvalidBusinessRegistrationNumberException
 import com.nearpick.app.common.validator.Validator
+import com.nearpick.app.domain.brand.dto.BrandResponse
+import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
 import com.nearpick.app.domain.brand.dto.UpdateBrandRequest
 import com.nearpick.app.domain.brand.entity.BrandEntity
-import com.nearpick.app.domain.user.entity.User
+import com.nearpick.app.domain.user.entity.UserEntity
+import com.nearpick.app.domain.user.service.User
 import java.util.UUID
 
 class Brand(
     val id: String? = null,
-    val ownerUser: User,
+    val ownerUserEntity: UserEntity,
     var name: String,
     var description: String? = null,
     val businessRegistrationNumber: String,
@@ -44,7 +47,7 @@ class Brand(
     fun toEntity(): BrandEntity {
         return BrandEntity(
             id = id?: UUID.randomUUID().toString(),
-            ownerUser = ownerUser,
+            ownerUserEntity = ownerUserEntity,
             name = name,
             description = description,
             businessRegistrationNumber = businessRegistrationNumber,
@@ -61,7 +64,7 @@ class Brand(
         fun from(brandEntity: BrandEntity): Brand {
             return Brand(
                 id = brandEntity.id,
-                ownerUser = brandEntity.ownerUser,
+                ownerUserEntity = brandEntity.ownerUserEntity,
                 name = brandEntity.name,
                 description = brandEntity.description,
                 businessRegistrationNumber = brandEntity.businessRegistrationNumber,
@@ -73,5 +76,34 @@ class Brand(
                 street = brandEntity.street
             )
         }
+
+        fun toResponse(brandEntity: BrandEntity): BrandResponse =
+            BrandResponse(
+                id = brandEntity.id,
+                name = brandEntity.name,
+                description = brandEntity.description,
+                businessRegistrationNumber = brandEntity.businessRegistrationNumber,
+                fullAddress = brandEntity.fullAddress,
+                addressDetail = brandEntity.addressDetail,
+                province = brandEntity.province,
+                district = brandEntity.district,
+                neighborhood = brandEntity.neighborhood,
+                street = brandEntity.street
+            )
+
+        fun toDetailResponse(brandEntity: BrandEntity): GetBrandDetailResponse =
+            GetBrandDetailResponse(
+                id = brandEntity.id,
+                ownerUser = User.toResponse(brandEntity.ownerUserEntity),
+                name = brandEntity.name,
+                description = brandEntity.description,
+                businessRegistrationNumber = brandEntity.businessRegistrationNumber,
+                fullAddress = brandEntity.fullAddress,
+                addressDetail = brandEntity.addressDetail,
+                province = brandEntity.province,
+                district = brandEntity.district,
+                neighborhood = brandEntity.neighborhood,
+                street = brandEntity.street
+            )
     }
 }

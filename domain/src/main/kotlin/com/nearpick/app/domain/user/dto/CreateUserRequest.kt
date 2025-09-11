@@ -13,10 +13,4 @@ data class CreateUserRequest(
     val accountHolderName: String? = null,
     val bankName: String? = null,
     val accountNumber: String? = null
-) {
-    init {
-        if (!phoneNumber.isNullOrBlank() && !Validator.isValidPhoneNumber(phoneNumber)) {
-            throw InvalidPhoneNumberException(phoneNumber)
-        }
-    }
-}
+)

@@ -1,11 +1,13 @@
 package com.nearpick.app.domain.product.entity
 
 import com.nearpick.app.domain.brand.entity.BrandEntity
+import com.nearpick.app.domain.brand.service.Brand
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.product.enum.ProductType
-import com.nearpick.app.domain.user.entity.User
+import com.nearpick.app.domain.user.entity.UserEntity
+import com.nearpick.app.domain.user.service.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -35,7 +37,7 @@ class Product(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
-    val seller: User,
+    val seller: UserEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
@@ -69,10 +71,10 @@ class Product(
     var updatedBy: String? = null
 ) {
     companion object {
-        fun createBySeller(request: CreateProductRequest, user: User, brandEntity: BrandEntity): Product =
+        fun createBySeller(request: CreateProductRequest, userEntity: UserEntity, brandEntity: BrandEntity): Product =
             Product(
                 id = UUID.randomUUID().toString(),
-                seller = user,
+                seller = userEntity,
                 brandEntity = brandEntity,
                 name = request.name,
                 description = request.description,
@@ -99,7 +101,7 @@ class Product(
             GetProductDetailResponse(
                 id = product.id,
                 seller = User.toResponse(product.seller),
-                brand = BrandEntity.toResponse(product.brandEntity),
+                brand = Brand.toResponse(product.brandEntity),
                 name = product.name,
                 description = product.description,
                 price = product.price,

@@ -3,7 +3,7 @@ package com.nearpick.app.domain.brand.entity
 import com.nearpick.app.domain.brand.dto.BrandResponse
 import com.nearpick.app.domain.brand.dto.CreateBrandRequest
 import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
-import com.nearpick.app.domain.user.entity.User
+import com.nearpick.app.domain.user.entity.UserEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -30,7 +30,7 @@ class BrandEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id", nullable = false)
-    val ownerUser: User,
+    val ownerUserEntity: UserEntity,
 
     var name: String,
 
@@ -61,50 +61,4 @@ class BrandEntity(
 
     @LastModifiedBy
     var updatedBy: String? = null
-) {
-    companion object {
-        fun createBySeller(request: CreateBrandRequest, user: User): BrandEntity =
-            BrandEntity(
-                id = UUID.randomUUID().toString(),
-                ownerUser = user,
-                name = request.name,
-                description = request.description,
-                businessRegistrationNumber = request.businessRegistrationNumber,
-                fullAddress = request.fullAddress,
-                addressDetail = request.addressDetail,
-                province = request.province,
-                district = request.district,
-                neighborhood = request.neighborhood,
-                street = request.street
-            )
-
-        fun toResponse(brandEntity: BrandEntity): BrandResponse =
-            BrandResponse(
-                id = brandEntity.id,
-                name = brandEntity.name,
-                description = brandEntity.description,
-                businessRegistrationNumber = brandEntity.businessRegistrationNumber,
-                fullAddress = brandEntity.fullAddress,
-                addressDetail = brandEntity.addressDetail,
-                province = brandEntity.province,
-                district = brandEntity.district,
-                neighborhood = brandEntity.neighborhood,
-                street = brandEntity.street
-            )
-
-        fun toDetailResponse(brandEntity: BrandEntity): GetBrandDetailResponse =
-            GetBrandDetailResponse(
-                id = brandEntity.id,
-                ownerUser = User.toResponse(brandEntity.ownerUser),
-                name = brandEntity.name,
-                description = brandEntity.description,
-                businessRegistrationNumber = brandEntity.businessRegistrationNumber,
-                fullAddress = brandEntity.fullAddress,
-                addressDetail = brandEntity.addressDetail,
-                province = brandEntity.province,
-                district = brandEntity.district,
-                neighborhood = brandEntity.neighborhood,
-                street = brandEntity.street
-            )
-    }
-}
+)

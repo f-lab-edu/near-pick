@@ -26,7 +26,7 @@ open class BrandServiceImpl(
 
         val brand = Brand(
             name = request.name,
-            ownerUser = user,
+            ownerUserEntity = user,
             description = request.description,
             businessRegistrationNumber = request.businessRegistrationNumber,
             fullAddress = request.fullAddress,
@@ -42,19 +42,19 @@ open class BrandServiceImpl(
         }
 
         val seller = brand.toEntity()
-        return BrandEntity.toResponse(brandRepository.save(seller))
+        return Brand.toResponse(brandRepository.save(seller))
     }
 
     @Transactional(readOnly = true)
     override fun findAllBrandByOwnerUser(userId: String): List<BrandResponse> {
-        return brandRepository.findAllByOwnerUserId(userId).map { BrandEntity.toResponse(it) }
+        return brandRepository.findAllByOwnerUserEntityId(userId).map { Brand.toResponse(it) }
     }
 
     @Transactional(readOnly = true)
     override fun findBrandDetail(id: String): GetBrandDetailResponse {
         val brand = getBrand(id)
 
-        return BrandEntity.toDetailResponse(brand)
+        return Brand.toDetailResponse(brand)
     }
 
     override fun updateBrand(id: String, userId: String, request: UpdateBrandRequest): BrandResponse {
@@ -63,7 +63,7 @@ open class BrandServiceImpl(
 
         brand.update(request)
 
-        return BrandEntity.toResponse(brandRepository.save(brand.toEntity()))
+        return Brand.toResponse(brandRepository.save(brand.toEntity()))
     }
 
     override fun deleteBrand(id: String, userId: String) {
@@ -77,6 +77,6 @@ open class BrandServiceImpl(
             ?: throw BrandNotFoundException(id, null)
 
     private fun getBrand(id: String, userId: String): BrandEntity =
-        brandRepository.findByIdAndOwnerUserId(id, userId)
+        brandRepository.findByIdAndOwnerUserEntityId(id, userId)
             ?: throw BrandNotFoundException(id, userId)
 }

@@ -72,7 +72,7 @@ open class ProductServiceImpl(
         brandRepository.findById(brandId).getOrElse { throw BrandNotFoundException(brandId, null) }
 
     private fun getBrand(brandId: String, userId: String): BrandEntity =
-        brandRepository.findByIdAndOwnerUserId(brandId, userId) ?: throw BrandNotFoundException(brandId, userId)
+        brandRepository.findByIdAndOwnerUserEntityId(brandId, userId) ?: throw BrandNotFoundException(brandId, userId)
 
     private fun getProduct(id: String): Product =
         productRepository.findById(id).orElse(null)

@@ -20,7 +20,7 @@ import java.util.*
 @Entity
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener::class)
-class User(
+class UserEntity(
     @Id
     val id: String = UUID.randomUUID().toString(),
 
@@ -59,32 +59,4 @@ class User(
 
     @LastModifiedBy
     var updatedBy: String? = null
-) {
-    companion object {
-        fun toEntity(createUserRequest: CreateUserRequest, role: Role, encodedPassword: String): User = User(
-            id = UUID.randomUUID().toString(),
-            email = createUserRequest.email,
-            nickname = createUserRequest.nickname,
-            password = encodedPassword,
-            profileImageUrl = createUserRequest.profileImageUrl,
-            phoneNumber = createUserRequest.phoneNumber,
-            role = role,
-            accountHolderName = createUserRequest.accountHolderName,
-            bankName = createUserRequest.bankName,
-            accountNumber = createUserRequest.accountNumber
-        )
-
-        fun toResponse(user: User): UserResponse = UserResponse(
-            id = user.id,
-            email = user.email,
-            nickname = user.nickname,
-            profileImageUrl = user.profileImageUrl,
-            phoneNumber = user.phoneNumber,
-            role = user.role.name,
-            accountHolderName = user.accountHolderName,
-            bankName = user.bankName,
-            accountNumber = user.accountNumber,
-            isActive = user.isActive
-        )
-    }
-}
+)
