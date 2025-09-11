@@ -39,7 +39,7 @@ class Product (
 
     fun toEntity(): ProductEntity {
         return ProductEntity(
-            id = UUID.randomUUID().toString(),
+            id = id?: UUID.randomUUID().toString(),
             seller = this.seller,
             brandEntity = this.brandEntity,
             name = this.name,
@@ -67,20 +67,6 @@ class Product (
                 isActive = productEntity.isActive
             )
         }
-
-        fun createBySeller(request: CreateProductRequest, userEntity: UserEntity, brandEntity: BrandEntity): ProductEntity =
-            ProductEntity(
-                id = UUID.randomUUID().toString(),
-                seller = userEntity,
-                brandEntity = brandEntity,
-                name = request.name,
-                description = request.description,
-                price = request.price,
-                stock = request.stock,
-                productType = request.productType,
-                reservationDeadline = request.reservationDeadline,
-                isActive = request.isActive ?: true
-            )
 
         fun toResponse(productEntity: ProductEntity): ProductResponse =
             ProductResponse(

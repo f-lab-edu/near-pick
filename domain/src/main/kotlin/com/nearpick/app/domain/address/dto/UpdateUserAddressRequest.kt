@@ -8,11 +8,5 @@ data class UpdateUserAddressRequest(
     val receiverName: String?,
     val phoneNumber: String?,
     val addressDetail: String?,
-    val isDefault: Boolean = false
-) {
-    init {
-        if (!phoneNumber.isNullOrBlank() && !Validator.isValidPhoneNumber(phoneNumber)) {
-            throw InvalidPhoneNumberException(phoneNumber)
-        }
-    }
-}
+    val isDefault: Boolean
+)
