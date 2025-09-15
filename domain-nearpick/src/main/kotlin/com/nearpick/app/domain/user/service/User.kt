@@ -6,6 +6,7 @@ import com.nearpick.app.common.validator.Validator
 import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.brand.service.Brand
 import com.nearpick.app.domain.user.dto.UpdateUserRequest
+import com.nearpick.app.domain.user.dto.UserPrincipalResponse
 import com.nearpick.app.domain.user.dto.UserResponse
 import com.nearpick.app.domain.user.entity.UserEntity
 import java.util.*
@@ -59,7 +60,6 @@ class User(
         this.bankName = request.bankName ?: this.bankName
         this.accountNumber = request.accountNumber ?: this.accountNumber
     }
-
     companion object {
         fun from(userEntity: UserEntity): User {
             return User(
@@ -88,6 +88,15 @@ class User(
                 accountHolderName = userEntity.accountHolderName,
                 bankName = userEntity.bankName,
                 accountNumber = userEntity.accountNumber,
+                isActive = userEntity.isActive
+            )
+
+        fun toPrincipalResponse(userEntity: UserEntity): UserPrincipalResponse =
+            UserPrincipalResponse(
+                id = userEntity.id,
+                email = userEntity.email,
+                password = userEntity.password,
+                role = userEntity.role,
                 isActive = userEntity.isActive
             )
     }

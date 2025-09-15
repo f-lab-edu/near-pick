@@ -5,7 +5,7 @@ import com.nearpick.app.domain.address.dto.CreateUserAddressRequest
 import com.nearpick.app.domain.address.dto.UpdateUserAddressRequest
 import com.nearpick.app.domain.address.dto.UserAddressResponse
 import com.nearpick.app.domain.address.service.UserAddressService
-import com.nearpick.app.common.user.UserPrincipal
+import com.nearpick.app.common.security.principal.UserPrincipal
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.http.ResponseEntity

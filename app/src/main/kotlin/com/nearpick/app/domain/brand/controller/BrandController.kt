@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.brand.controller
 
 import com.nearpick.app.common.response.Response
-import com.nearpick.app.common.user.UserPrincipal
+import com.nearpick.app.common.security.principal.UserPrincipal
 import com.nearpick.app.domain.brand.dto.BrandResponse
 import com.nearpick.app.domain.brand.dto.CreateBrandRequest
 import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse

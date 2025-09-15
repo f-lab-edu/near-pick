@@ -1,4 +1,4 @@
-package com.nearpick.app.common.security.config
+package com.nearpick.app.common.security
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
@@ -6,5 +6,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class JwtProperties(
     val secret: String,
     val accessTokenExpiration: Long,
-    val refreshTokenExpiration: Long
+//    val refreshTokenExpiration: Long
 )

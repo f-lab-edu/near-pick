@@ -1,14 +1,12 @@
 package com.nearpick.app.common.config
 
-import com.nearpick.app.common.user.UserPrincipal
-import org.springframework.context.annotation.Configuration
+import com.nearpick.app.common.security.principal.UserPrincipal
 import org.springframework.data.domain.AuditorAware
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.stereotype.Component
 import java.util.Optional
 
-@EnableJpaAuditing
-@Configuration
+@Component("auditConfig")
 class AuditConfig() : AuditorAware<String> {
     override fun getCurrentAuditor(): Optional<String> {
         val data = Optional.ofNullable(SecurityContextHolder.getContext())

@@ -1,31 +1,37 @@
 package com.nearpick.app.common.security
 
-import com.nearpick.app.common.security.config.JwtProperties
+import com.nearpick.app.domain.auth.dto.JwtToken
+import com.nearpick.app.domain.auth.port.JwtTokenProvider
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Component
-import java.util.*
+import java.util.Date
 import javax.crypto.SecretKey
 
 @Component
-class JwtTokenProvider(
+class JwtTokenProviderAdapter(
     private val jwtProperties: JwtProperties
-) {
+) : JwtTokenProvider {
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
-    fun generateToken(userId: String, role: String): String {
+    override fun generateToken(userId: String, role: String): JwtToken {
         val now = Date()
         val expiry = Date(now.time + jwtProperties.accessTokenExpiration)
 
-        return Jwts.builder()
+        val jwt = Jwts.builder()
             .setSubject(userId)
             .claim("role", role)
             .setIssuedAt(now)
             .setExpiration(expiry)
             .signWith(secretKey, SignatureAlgorithm.HS256)
             .compact()
+
+        return JwtToken(
+            accessToken = jwt,
+            accessTokenExpiresAt = expiry.toInstant()
+        )
     }
 
     fun getUserId(token: String): String =
@@ -34,7 +40,7 @@ class JwtTokenProvider(
     fun getRole(token: String): String =
         parseClaims(token).get("role", String::class.java)
 
-    fun validateToken(token: String): Boolean = try {
+    override fun validateToken(token: String): Boolean = try {
         parseClaims(token)
         true
     } catch (e: Exception) {

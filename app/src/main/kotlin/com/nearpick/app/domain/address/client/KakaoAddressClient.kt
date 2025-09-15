@@ -10,10 +10,10 @@ import java.time.Duration
 class KakaoAddressClient(
     @Value("\${kakao.rest-api-key}") private val kakaoApiKey: String,
     private val webClientBuilder: WebClient.Builder
-) {
+): AddressClient {
     private val kakaoBaseUrl = "https://dapi.kakao.com"
 
-    fun searchAddress(query: String): Result<List<SearchAddressDto.Document>> {
+    override fun searchAddress(query: String): Result<List<SearchAddressDto.Document>> {
         return runCatching {
             webClientBuilder.build()
                 .get()

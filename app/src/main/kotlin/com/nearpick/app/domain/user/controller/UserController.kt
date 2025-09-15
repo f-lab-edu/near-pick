@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.user.controller
 
 import com.nearpick.app.common.response.Response
-import com.nearpick.app.common.user.UserPrincipal
+import com.nearpick.app.common.security.principal.UserPrincipal
 import com.nearpick.app.domain.user.dto.CheckEmailRequest
 import com.nearpick.app.domain.user.dto.CheckEmailVerificationRequest
 import com.nearpick.app.domain.user.dto.CreateUserRequest

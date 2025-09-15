@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.product.controller
 
 import com.nearpick.app.common.response.Response
-import com.nearpick.app.common.user.UserPrincipal
+import com.nearpick.app.common.security.principal.UserPrincipal
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse

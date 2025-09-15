@@ -1,4 +1,4 @@
-package com.nearpick.app.common.user
+package com.nearpick.app.common.security.principal
 
 import com.nearpick.app.common.constant.Role
 import org.springframework.security.core.GrantedAuthority

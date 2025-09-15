@@ -1,9 +1,16 @@
 package com.nearpick.app.common.exception
 
-import org.springframework.http.HttpStatus
 
 open class BaseException(
     val code: String,
     override val message: String,
-    val status: HttpStatus
+    val category: ErrorCategory
 ) : RuntimeException(message)
+
+
+enum class ErrorCategory {
+    VALIDATION,
+    NOT_FOUND,
+    AUTH,
+    INTERNAL
+}
