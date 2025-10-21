@@ -85,6 +85,7 @@ class ProductController(
 
     @Operation(summary = "판매자 상품 삭제(SELLER)", description = "판매자의 상품을 삭제합니다.(SELLER)")
     @ApiResponse(responseCode = "200", description = "판매자 상품 삭제 성공")
+    @PreAuthorize("hasRole('SELLER')")
     @DeleteMapping("/{id}")
     fun deleteProduct(
         @PathVariable id: String,

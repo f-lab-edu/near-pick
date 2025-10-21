@@ -1,14 +1,9 @@
-package com.nearpick.app.domain.product.entity
+package com.nearpick.app.domain.purchase.entity
 
-import com.nearpick.app.domain.brand.entity.BrandEntity
-import com.nearpick.app.domain.brand.service.Brand
-import com.nearpick.app.domain.product.dto.CreateProductRequest
-import com.nearpick.app.domain.product.dto.GetProductDetailResponse
-import com.nearpick.app.domain.product.dto.ProductResponse
-import com.nearpick.app.domain.product.enum.ProductStatus
+import com.nearpick.app.domain.purchase.enum.PurchaseStatus
+import com.nearpick.app.domain.product.entity.ProductEntity
 import com.nearpick.app.domain.product.enum.ProductType
 import com.nearpick.app.domain.user.entity.UserEntity
-import com.nearpick.app.domain.user.service.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -26,39 +21,36 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.math.BigInteger
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Entity
-@Table(name = "product")
+@Table(name = "purchase")
 @EntityListeners(AuditingEntityListener::class)
-class ProductEntity(
+class PurchaseEntity (
     @Id
     @Column(name = "id", nullable = false, length = 255)
     val id: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false)
-    val seller: UserEntity,
+    @JoinColumn(name = "user_id", nullable = false)
+    val user: UserEntity,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    val brandEntity: BrandEntity,
-
-    var name: String,
-
-    var description: String? = null,
-
-    var price: BigInteger,
-
-    var stock: Int? = null,
+    @JoinColumn(name = "product_id")
+    val product: ProductEntity,
 
     @Enumerated(EnumType.STRING)
     var productType: ProductType,
 
-    var reservationDeadline: LocalDateTime? = null,
+    var totalPrice: BigInteger,
+
+    var quantity: Int,
+
+    var reservationDt: LocalDateTime? = null,
 
     @Enumerated(EnumType.STRING)
-    var status: ProductStatus,
+    var status: PurchaseStatus,
+
+    var requestMessage: String? = null,
 
     @CreatedDate
     var createdAt: LocalDateTime? = null,

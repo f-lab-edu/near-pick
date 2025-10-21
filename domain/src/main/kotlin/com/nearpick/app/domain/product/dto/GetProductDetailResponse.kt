@@ -1,6 +1,7 @@
 package com.nearpick.app.domain.product.dto
 
 import com.nearpick.app.domain.brand.dto.BrandResponse
+import com.nearpick.app.domain.product.enum.ProductStatus
 import com.nearpick.app.domain.product.enum.ProductType
 import com.nearpick.app.domain.user.dto.UserResponse
 import java.math.BigInteger
@@ -16,5 +17,5 @@ data class GetProductDetailResponse(
     val stock: Int? = null,
     val productType: ProductType,
     val reservationDeadline: LocalDateTime? = null,
-    val isActive: Boolean? = true
+    val status: ProductStatus
 )
