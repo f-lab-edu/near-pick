@@ -100,21 +100,22 @@ class PurchaseController(
         )
     }
 
-    @Operation(summary = "판매자 주문 수정(SELLER)", description = "판매자의 주문을 수정합니다.(SELLER)")
-    @ApiResponse(responseCode = "200", description = "판매자 주문 수정 성공")
-    @PreAuthorize("hasRole('SELLER')")
-    @PutMapping("/{id}")
-    fun updatePurchase(
-        @PathVariable id: String,
-        @RequestBody request: UpdatePurchaseRequest,
-        @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<Response<PurchaseResponse>> {
-        return ResponseEntity.ok(
-            Response.success(
-                purchaseService.updatePurchase(id, userPrincipal.getUserId(), request)
-            )
-        )
-    }
+    //TODO: 선착순 구매, 예약 기능에 영향을 주므로 개발 이후 구현 예정
+//    @Operation(summary = "판매자 주문 수정(SELLER)", description = "판매자의 주문을 수정합니다.(SELLER)")
+//    @ApiResponse(responseCode = "200", description = "판매자 주문 수정 성공")
+//    @PreAuthorize("hasRole('SELLER')")
+//    @PutMapping("/{id}")
+//    fun updatePurchase(
+//        @PathVariable id: String,
+//        @RequestBody request: UpdatePurchaseRequest,
+//        @AuthenticationPrincipal userPrincipal: UserPrincipal
+//    ): ResponseEntity<Response<PurchaseResponse>> {
+//        return ResponseEntity.ok(
+//            Response.success(
+//                purchaseService.updatePurchase(id, userPrincipal.getUserId(), request)
+//            )
+//        )
+//    }
 
     @Operation(summary = "주문 상태 변경", description = "주문 상태를 변경합니다.")
     @ApiResponse(responseCode = "200", description = "판매자 주문 상태 변경 성공")

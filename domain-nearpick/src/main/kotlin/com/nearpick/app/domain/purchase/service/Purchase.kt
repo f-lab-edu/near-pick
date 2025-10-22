@@ -48,8 +48,8 @@ class Purchase(
         }
 
         val transitionRule = mapOf(
-            PurchaseStatus.PENDING   to setOf(PurchaseStatus.CANCELLED),
-            PurchaseStatus.CONFIRMED to setOf(PurchaseStatus.CONFIRMED, PurchaseStatus.SUCCESS, PurchaseStatus.CANCELLED),
+            PurchaseStatus.PENDING   to setOf(PurchaseStatus.CANCELLED, PurchaseStatus.CONFIRMED),
+            PurchaseStatus.CONFIRMED to setOf(PurchaseStatus.SUCCESS, PurchaseStatus.CANCELLED),
             PurchaseStatus.CANCELLED to emptySet(),
             PurchaseStatus.SUCCESS   to emptySet()
         )

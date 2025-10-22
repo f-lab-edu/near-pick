@@ -69,10 +69,12 @@ open class PurchaseServiceImpl(
 
     override fun updatePurchase(id: String, userId: String, request: UpdatePurchaseRequest)
         : PurchaseResponse {
+
         val purchaseEntity = getPurchaseBySeller(id, userId)
         val purchase = Purchase.from(purchaseEntity)
 
-        purchase.update(request)
+        //TODO: 선착순 구매, 예약 기능에 영향을 주므로 개발 이후 구현 예정
+//        purchase.update(request)
 
         return Purchase.toResponse(purchaseRepository.save(purchase.toEntity()))
     }

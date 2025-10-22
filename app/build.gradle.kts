@@ -56,6 +56,7 @@ dependencies {
     testImplementation("io.kotest:kotest-framework-engine:5.9.1")
     testImplementation("io.mockk:mockk:1.13.10") // MockK
 
+
     testCompileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
 
 }
