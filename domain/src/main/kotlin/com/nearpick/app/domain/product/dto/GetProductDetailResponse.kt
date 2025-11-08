@@ -16,6 +16,7 @@ data class GetProductDetailResponse(
     val price: BigInteger,
     val stock: Int? = null,
     val productType: ProductType,
-    val reservationDeadline: LocalDateTime? = null,
+    val startDt: LocalDateTime? = null,
+    val endDt: LocalDateTime? = null,
     val status: ProductStatus
 )

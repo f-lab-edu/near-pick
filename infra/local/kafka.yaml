@@ -23,9 +23,13 @@ spec:
             - name: KAFKA_CFG_ZOOKEEPER_CONNECT
               value: "zookeeper:2181"
             - name: KAFKA_CFG_LISTENERS
-              value: "PLAINTEXT://:9092"
+              value: "PLAINTEXT://:9092,EXTERNAL://:30092"
             - name: KAFKA_CFG_ADVERTISED_LISTENERS
-              value: "PLAINTEXT://kafka:9092"
+              value: "PLAINTEXT://kafka:9092,EXTERNAL://localhost:30092"
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT"
+            - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+              value: "PLAINTEXT"
             - name: ALLOW_PLAINTEXT_LISTENER
               value: "yes"
 ---
@@ -37,7 +41,11 @@ spec:
   selector:
     app: kafka
   ports:
-    - port: 9092
+    - name: plaintext
+      port: 9092
       targetPort: 9092
+    - name: external
+      port: 30092
+      targetPort: 30092
       nodePort: 30092
   type: NodePort

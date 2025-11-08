@@ -3,7 +3,6 @@ package com.nearpick.app.domain.product.service
 import com.nearpick.app.common.exception.ProductStatusActiveException
 import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.brand.service.Brand
-import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.product.dto.UpdateProductRequest
@@ -25,22 +24,25 @@ class Product(
     var price: BigInteger,
     var stock: Int? = null,
     var productType: ProductType,
-    var reservationDeadline: LocalDateTime? = null,
+    var startDt: LocalDateTime? = null,
+    var endDt: LocalDateTime? = null,
     var status: ProductStatus? = ProductStatus.ACTIVE,
 
     ) {
     fun update(request: UpdateProductRequest) {
         if (this.status == ProductStatus.ACTIVE &&
-            request.price != null && request.stock != null && request.productType != null && request.reservationDeadline != null
+            request.price != null && request.stock != null && request.productType != null && request.startDt != null && request.endDt != null
         ) {
             throw ProductStatusActiveException(this.id)
         }
+
         this.name = request.name ?: this.name
         this.description = request.description ?: this.description
         this.price = request.price ?: this.price
         this.stock = request.stock ?: this.stock
         this.productType = request.productType ?: this.productType
-        this.reservationDeadline = request.reservationDeadline ?: this.reservationDeadline
+        this.startDt = request.startDt
+        this.endDt = request.endDt ?: this.endDt
     }
 
     fun updateStatus(status: ProductStatus) {
@@ -57,7 +59,8 @@ class Product(
             price = this.price,
             stock = this.stock,
             productType = this.productType,
-            reservationDeadline = this.reservationDeadline,
+            startDt = this.startDt,
+            endDt = this.endDt,
             status = this.status ?: ProductStatus.ACTIVE
         )
     }
@@ -73,7 +76,8 @@ class Product(
                 price = productEntity.price,
                 stock = productEntity.stock,
                 productType = productEntity.productType,
-                reservationDeadline = productEntity.reservationDeadline,
+                startDt = productEntity.startDt,
+                endDt = productEntity.endDt,
                 status = productEntity.status
             )
         }
@@ -86,7 +90,8 @@ class Product(
                 price = productEntity.price,
                 stock = productEntity.stock,
                 productType = productEntity.productType,
-                reservationDeadline = productEntity.reservationDeadline,
+                startDt = productEntity.startDt,
+                endDt = productEntity.endDt,
                 status = productEntity.status
             )
 
@@ -100,8 +105,22 @@ class Product(
                 price = productEntity.price,
                 stock = productEntity.stock,
                 productType = productEntity.productType,
-                reservationDeadline = productEntity.reservationDeadline,
+                startDt = productEntity.startDt,
+                endDt = productEntity.endDt,
                 status = productEntity.status
             )
+
+        fun isActiveFirstCome(productEntity: ProductEntity): Boolean {
+            return  isActiveFirstCome(productEntity.status, productEntity.startDt, productEntity.endDt, productEntity.stock)
+        }
+
+        fun isActiveFirstCome(status: ProductStatus, startDt: LocalDateTime?, endDt: LocalDateTime?, stock: Int?): Boolean {
+            val allowedStatus = listOf(ProductStatus.ACTIVE, ProductStatus.PENDING)
+
+            return allowedStatus.contains(status)
+                && startDt?.isBefore(LocalDateTime.now()) == true
+                && endDt?.isAfter(LocalDateTime.now()) == true
+                && (stock ?: 0) > 0
+        }
     }
 }

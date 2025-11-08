@@ -40,7 +40,8 @@ open class ProductServiceImpl(
             price = request.price,
             stock = request.stock,
             productType = request.productType,
-            reservationDeadline = request.reservationDeadline
+            startDt = request.startDt,
+            endDt = request.endDt
         )
 
         return Product.toResponse(productRepository.save(product.toEntity()))

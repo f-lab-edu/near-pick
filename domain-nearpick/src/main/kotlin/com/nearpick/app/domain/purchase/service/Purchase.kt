@@ -3,6 +3,7 @@ package com.nearpick.app.domain.purchase.service
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.PurchaseStatusInvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidTransitionException
+import com.nearpick.app.domain.product.dto.ProductFirstComeCache
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailByUserResponse
@@ -13,6 +14,7 @@ import com.nearpick.app.domain.purchase.enum.PurchaseStatus
 import com.nearpick.app.domain.product.entity.ProductEntity
 import com.nearpick.app.domain.product.enum.ProductType
 import com.nearpick.app.domain.product.service.Product
+import com.nearpick.app.domain.purchase.dto.OrderReceivedResponse
 import com.nearpick.app.domain.user.entity.UserEntity
 import com.nearpick.app.domain.user.service.User
 import java.math.BigInteger
@@ -76,6 +78,38 @@ class Purchase(
     }
 
     companion object {
+        fun ofOrderReceived(
+            createPurchaseRequest: CreatePurchaseRequest,
+            productEntity: ProductFirstComeCache
+        ): OrderReceivedResponse {
+            return OrderReceivedResponse(
+                id = null,
+                productId = createPurchaseRequest.productId,
+                productType = productEntity.productType,
+                totalPrice = productEntity.price.multiply(createPurchaseRequest.quantity.toBigInteger()),
+                quantity = createPurchaseRequest.quantity,
+                reservationDt = createPurchaseRequest.reservationDt,
+                status = PurchaseStatus.PENDING,
+                requestMessage = createPurchaseRequest.requestMessage
+            )
+        }
+
+        fun ofOrderReceived(
+            createPurchaseRequest: CreatePurchaseRequest,
+            productEntity: ProductEntity
+        ): OrderReceivedResponse {
+            return OrderReceivedResponse(
+                id = null,
+                productId = createPurchaseRequest.productId,
+                productType = productEntity.productType,
+                totalPrice = productEntity.price.multiply(createPurchaseRequest.quantity.toBigInteger()),
+                quantity = createPurchaseRequest.quantity,
+                reservationDt = createPurchaseRequest.reservationDt,
+                status = PurchaseStatus.PENDING,
+                requestMessage = createPurchaseRequest.requestMessage
+            )
+        }
+
         fun create(
             createPurchaseRequest: CreatePurchaseRequest,
             userEntity: UserEntity,

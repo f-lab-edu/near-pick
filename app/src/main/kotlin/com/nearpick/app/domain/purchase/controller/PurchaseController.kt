@@ -7,7 +7,7 @@ import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.service.PurchaseService
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailByUserResponse
-import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
+import com.nearpick.app.domain.purchase.dto.OrderReceivedResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -34,7 +34,7 @@ class PurchaseController(
     fun createPurchase(
         @RequestBody request: CreatePurchaseRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<Response<PurchaseResponse>> {
+    ): ResponseEntity<Response<OrderReceivedResponse>> {
         return ResponseEntity.ok(
             Response.success(
                 purchaseService.createPurchase(request, userPrincipal.getUserId())
