@@ -141,6 +141,12 @@ class ProductStatusActiveException(productId: String?) : BaseException(
     category = ErrorCategory.VALIDATION
 )
 
+class ProductOutOfStockException(productId: String) : BaseException(
+    code = "PRODUCT_OUT_OF_STOCK",
+    message = "상품의 재고가 없습니다. (productId=$productId)",
+    category = ErrorCategory.VALIDATION
+)
+
 // 주문 정보 관련 예외
 class PurchaseNotFoundException(purchaseId: String?, userId: String?) : BaseException(
     code = "PURCHASE_NOT_FOUND",
@@ -159,3 +165,23 @@ class PurchaseStatusInvalidRoleException(role: String?, requestedStatus: String?
     message = "주문 상태를 변경할 권한이 없습니다. (role=$Role, requestedStatus=$requestedStatus)",
     category = ErrorCategory.NOT_FOUND
 )
+
+class CurrentProductDataNotFoundException(version: String?) : BaseException(
+    code = "CURRENT_PRODUCT_DATA_NOT_FOUND",
+    message = "상품 데이터가 없습니다. (version=$version)",
+    category = ErrorCategory.INTERNAL
+)
+
+class CurrentProductStockDataNotFoundException(version: String?) : BaseException(
+    code = "CURRENT_PRODUCT_STOCK_DATA_NOT_FOUND",
+    message = "상품 재고 데이터가 없습니다. (version=$version)",
+    category = ErrorCategory.INTERNAL
+)
+
+class InvalidPurchaseException(status: String) : BaseException(
+    code = "INVALID_PURCHASE",
+    message = "상품을 구매할 수 없습니다. (product status=$status)",
+    category = ErrorCategory.VALIDATION
+)
+
+

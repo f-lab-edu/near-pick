@@ -8,11 +8,12 @@ import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 
 interface PurchaseService {
-    fun createPurchase(request: CreatePurchaseRequest, userId: String): PurchaseResponse
+    fun createPurchase(request: CreatePurchaseRequest, userId: String): OrderReceivedResponse
     fun findAllPurchaseBySeller(userId: String): List<PurchaseResponse>
     fun findAllPurchaseByUser(userId: String): List<PurchaseResponse>
     fun findPurchaseDetailByUser(id: String, userId: String): GetPurchaseDetailResponse
     fun findPurchaseDetailBySeller(id: String, userId: String): GetPurchaseDetailResponse
     fun updatePurchase(id: String, userId: String, request: UpdatePurchaseRequest): PurchaseResponse
     fun updatePurchaseStatus(id: String, userId: String, userRole: Role, request: UpdatePurchaseStatusRequest): PurchaseResponse
+    fun applyPurchase(event: CreatePurchaseRequest, userId: String): Boolean
 }

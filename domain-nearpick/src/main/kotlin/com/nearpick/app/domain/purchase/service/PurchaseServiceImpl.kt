@@ -13,11 +13,15 @@ import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 import com.nearpick.app.domain.purchase.entity.PurchaseEntity
 import com.nearpick.app.domain.purchase.repository.PurchaseRepository
 import com.nearpick.app.domain.product.entity.ProductEntity
+import com.nearpick.app.domain.product.enum.ProductStatus
 import com.nearpick.app.domain.product.repository.ProductRepository
+import com.nearpick.app.domain.purchase.dto.OrderReceivedResponse
+import com.nearpick.app.domain.purchase.enum.PurchaseStatus
+import com.nearpick.app.domain.stock.service.StockService
+import com.nearpick.app.domain.user.entity.UserEntity
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrElse
 
 
 @Service
@@ -25,17 +29,14 @@ import kotlin.jvm.optionals.getOrElse
 open class PurchaseServiceImpl(
     private val purchaseRepository: PurchaseRepository,
     private val productRepository: ProductRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val strategyFactory: PurchaseStrategyFactory,
+    private val stockService: StockService
 ) : PurchaseService {
     override fun createPurchase(request: CreatePurchaseRequest, userId: String)
-        : PurchaseResponse {
-        val productEntity = getProduct(request.productId)
-        val userEntity = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
-
-        //TODO: make Logic
-        val purchase = Purchase.create(request, userEntity, productEntity)
-
-        return Purchase.toResponse(purchaseRepository.save(purchase.toEntity()))
+        : OrderReceivedResponse {
+        val strategy = strategyFactory.getStrategy(request.productType)
+        return strategy.createPurchase(request, userId)
     }
 
     @Transactional(readOnly = true)
@@ -90,6 +91,39 @@ open class PurchaseServiceImpl(
         purchase.updateStatus(userRole, request.status)
 
         return Purchase.toResponse(purchaseRepository.save(purchase.toEntity()))
+    }
+
+    override fun applyPurchase(event: CreatePurchaseRequest, userId: String): Boolean {
+        val user = userRepository.findById(userId)
+            .orElseThrow { UserNotFoundException(userId) }
+
+        val product = productRepository.findById(event.productId)
+            .orElseThrow { ProductNotFoundException(event.productId, userId) }
+
+        val stock = product.stock ?: 0
+        if (stock < event.quantity) {
+            handleStockInconsistency(event, user, product)
+            return false
+        }
+
+        product.stock = stock - event.quantity
+        if (stock == event.quantity) {
+            product.status = ProductStatus.INACTIVE_SOLD_OUT
+        }
+        productRepository.save(product)
+
+        val purchase = Purchase.create(event, user, product)
+        purchaseRepository.save(purchase.toEntity())
+
+        return true
+    }
+
+    fun handleStockInconsistency(event: CreatePurchaseRequest, user: UserEntity, product: ProductEntity) {
+        stockService.recoverStock(event.productId, event.quantity)
+
+        val purchase = Purchase.create(event, user, product)
+        purchase.status = PurchaseStatus.CANCELLED
+        purchaseRepository.save(purchase.toEntity())
     }
 
     private fun getProduct(id: String): ProductEntity =

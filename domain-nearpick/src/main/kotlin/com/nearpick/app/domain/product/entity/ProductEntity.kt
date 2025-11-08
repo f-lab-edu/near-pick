@@ -55,7 +55,9 @@ class ProductEntity(
     @Enumerated(EnumType.STRING)
     var productType: ProductType,
 
-    var reservationDeadline: LocalDateTime? = null,
+    var startDt: LocalDateTime? = null,
+
+    var endDt: LocalDateTime? = null,
 
     @Enumerated(EnumType.STRING)
     var status: ProductStatus,

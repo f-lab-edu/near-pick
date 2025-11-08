@@ -5,12 +5,10 @@ import com.nearpick.app.domain.product.enum.ProductType
 import java.math.BigInteger
 import java.time.LocalDateTime
 
-data class UpdateProductRequest(
-    val name: String? = null,
-    val description: String? = null,
-    val price: BigInteger? = null,
-    val stock: Int? = null,
-    val productType: ProductType? = null,
+data class ProductFirstComeCache (
+    val price: BigInteger,
+    val productType: ProductType,
     val startDt: LocalDateTime? = null,
-    val endDt: LocalDateTime? = null
+    val endDt: LocalDateTime? = null,
+    val status: ProductStatus
 )
