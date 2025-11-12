@@ -7,7 +7,6 @@ import com.nearpick.app.common.security.principal.UserPrincipal
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.service.PurchaseService
-import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 import io.swagger.v3.oas.annotations.Operation
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import javax.management.relation.RoleNotFoundException
 
 @RestController
 @RequestMapping("/api/v1/purchases")
@@ -43,20 +41,6 @@ class PurchaseController(
             )
         )
     }
-
-//    @Operation(summary = "판매자 별 주문 조회", description = "해당 판매자가 등록한 상품을 주문한 전체 내역을 조회합니다.")
-//    @ApiResponse(responseCode = "200", description = "판매자의 주문 조회 성공")
-//    @GetMapping("/seller")
-//    @PreAuthorize("hasRole('SELLER')")
-//    fun getPurchaseListBySeller(
-//        @AuthenticationPrincipal userPrincipal: UserPrincipal
-//    ): ResponseEntity<Response<List<PurchaseResponse>>> {
-//        return ResponseEntity.ok(
-//            Response.success(
-//                purchaseService.findAllPurchaseBySeller(userPrincipal.getUserId())
-//            )
-//        )
-//    }
 
     @Operation(summary = "주문 조회", description = "해당 판매자가 등록한 상품을 주문한 내역이나 해당 사용자가 직접 주문한 전체 내역을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "사용자의 주문 조회 성공")
@@ -98,21 +82,6 @@ class PurchaseController(
             )
         )
     }
-
-//    @Operation(summary = "판매자의 주문을 상세 조회", description = "판매자의 주문을 상세 조회합니다.")
-//    @ApiResponse(responseCode = "200", description = "판매자의 주문 상세 조회 성공")
-//    @GetMapping("/seller/{id}")
-//    @PreAuthorize("hasRole('SELLER')")
-//    fun getPurchaseDetailBySeller(
-//        @PathVariable id: String,
-//        @AuthenticationPrincipal userPrincipal: UserPrincipal
-//    ): ResponseEntity<Response<GetPurchaseDetailBySellerResponse>> {
-//        return ResponseEntity.ok(
-//            Response.success(
-//                purchaseService.findPurchaseDetailBySeller(id, userPrincipal.getUserId())
-//            )
-//        )
-//    }
 
     //TODO: 선착순 구매, 예약 기능에 영향을 주므로 개발 이후 구현 예정
 //    @Operation(summary = "판매자 주문 수정(SELLER)", description = "판매자의 주문을 수정합니다.(SELLER)")
