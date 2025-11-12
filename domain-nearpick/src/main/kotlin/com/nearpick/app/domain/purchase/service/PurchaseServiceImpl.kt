@@ -7,7 +7,7 @@ import com.nearpick.app.common.exception.ProductNotFoundException
 import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
-import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailByUserResponse
+import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
@@ -53,7 +53,7 @@ open class PurchaseServiceImpl(
 
     @Transactional(readOnly = true)
     override fun findPurchaseDetailByUser(id: String, userId: String)
-        : GetPurchaseDetailByUserResponse {
+        : GetPurchaseDetailResponse {
         val purchaseEntity = getPurchaseByUser(id, userId)
 
         return Purchase.toDetailResponseByUser(purchaseEntity)
@@ -61,7 +61,7 @@ open class PurchaseServiceImpl(
 
     @Transactional(readOnly = true)
     override fun findPurchaseDetailBySeller(id: String, userId: String)
-        : GetPurchaseDetailBySellerResponse {
+        : GetPurchaseDetailResponse {
         val purchaseEntity = getPurchaseBySeller(id, userId)
 
         return Purchase.toDetailResponseBySeller(purchaseEntity)

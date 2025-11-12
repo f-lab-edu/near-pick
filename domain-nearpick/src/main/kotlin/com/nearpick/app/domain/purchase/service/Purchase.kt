@@ -5,7 +5,7 @@ import com.nearpick.app.common.exception.PurchaseStatusInvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidTransitionException
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
-import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailByUserResponse
+import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
 import com.nearpick.app.domain.purchase.entity.PurchaseEntity
@@ -121,8 +121,8 @@ class Purchase(
             )
         }
 
-        fun toDetailResponseBySeller(purchaseEntity: PurchaseEntity): GetPurchaseDetailBySellerResponse {
-            return GetPurchaseDetailBySellerResponse(
+        fun toDetailResponseBySeller(purchaseEntity: PurchaseEntity): GetPurchaseDetailResponse {
+            return GetPurchaseDetailResponse(
                 id = purchaseEntity.id,
                 user = User.toResponse(purchaseEntity.user),
                 product = Product.toResponse(purchaseEntity.product),
@@ -134,9 +134,10 @@ class Purchase(
             )
         }
 
-        fun toDetailResponseByUser(purchaseEntity: PurchaseEntity): GetPurchaseDetailByUserResponse {
-            return GetPurchaseDetailByUserResponse(
+        fun toDetailResponseByUser(purchaseEntity: PurchaseEntity): GetPurchaseDetailResponse {
+            return GetPurchaseDetailResponse(
                 id = purchaseEntity.id,
+                user = User.toResponse(purchaseEntity.user),
                 product = Product.toResponse(purchaseEntity.product),
                 totalPrice = purchaseEntity.totalPrice,
                 quantity = purchaseEntity.quantity,
