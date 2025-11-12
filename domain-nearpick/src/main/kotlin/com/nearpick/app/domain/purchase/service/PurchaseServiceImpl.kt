@@ -6,7 +6,6 @@ import com.nearpick.app.common.exception.PurchaseNotFoundException
 import com.nearpick.app.common.exception.ProductNotFoundException
 import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
-import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest

@@ -4,7 +4,6 @@ import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.PurchaseStatusInvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidTransitionException
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
-import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailBySellerResponse
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
