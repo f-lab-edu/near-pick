@@ -3,6 +3,7 @@ package com.nearpick.app.domain.purchase.service
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
+import com.nearpick.app.domain.purchase.dto.OrderReceivedResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
