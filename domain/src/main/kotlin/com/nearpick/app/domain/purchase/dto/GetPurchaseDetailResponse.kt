@@ -7,7 +7,7 @@ import java.math.BigInteger
 import java.time.LocalDateTime
 
 data class GetPurchaseDetailResponse (
-    val id: String,
+    val id: String?,
     val user: UserResponse,
     val product: ProductResponse,
     val totalPrice: BigInteger,

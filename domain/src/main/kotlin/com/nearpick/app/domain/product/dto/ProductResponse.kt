@@ -6,12 +6,12 @@ import java.math.BigInteger
 import java.time.LocalDateTime
 
 data class ProductResponse(
-    val id: String,
+    val id: String? = null,
     val name: String,
     val description: String? = null,
     val price: BigInteger,
     val stock: Int? = null,
     val productType: ProductType,
     val reservationDeadline: LocalDateTime? = null,
-    val status: ProductStatus
+    val status: ProductStatus? = null
 )

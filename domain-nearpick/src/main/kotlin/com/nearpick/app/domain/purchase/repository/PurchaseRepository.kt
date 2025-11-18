@@ -10,5 +10,5 @@ interface PurchaseRepository : JpaRepository<PurchaseEntity, String> {
     fun findByIdAndUserId(id: String, userId: String): Optional<PurchaseEntity>
     fun findAllByProduct_Seller_Id(sellerId: String): List<PurchaseEntity>
     fun findByIdAndProduct_Seller_Id(id: String, sellerId: String): Optional<PurchaseEntity>
-    fun existsByProduct(productEntity: ProductEntity): Boolean
+    fun existsByProduct_Id(productId: String): Boolean
 }

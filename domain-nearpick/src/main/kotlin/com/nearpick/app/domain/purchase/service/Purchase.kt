@@ -20,8 +20,8 @@ import java.util.UUID
 
 class Purchase(
     val id: String? = null,
-    val user: UserEntity,
-    val product: ProductEntity,
+    val userId: String,
+    val productId: String,
     val productType: ProductType,
     var totalPrice: BigInteger,
     var quantity: Int,
@@ -29,16 +29,21 @@ class Purchase(
     var status: PurchaseStatus,
     var requestMessage: String? = null
 ) {
-    fun update(request: UpdatePurchaseRequest) {
-        this.totalPrice = request.price
-        this.quantity = request.quantity
-        this.reservationDt = request.reservationDt
-        this.requestMessage = request.requestMessage
+    fun update(
+        price: BigInteger,
+        quantity: Int,
+        reservationDt: LocalDateTime?,
+        message: String?
+    ) {
+        this.totalPrice = price
+        this.quantity = quantity
+        this.reservationDt = reservationDt
+        this.requestMessage = message
     }
 
     fun updateStatus(userRole: Role, status: PurchaseStatus) {
         val allowedByRole = mapOf(
-            Role.USER   to setOf(PurchaseStatus.CANCELLED),
+            Role.USER to setOf(PurchaseStatus.CANCELLED),
             Role.SELLER to setOf(PurchaseStatus.CONFIRMED, PurchaseStatus.CANCELLED, PurchaseStatus.SUCCESS)
         )
 
@@ -47,10 +52,10 @@ class Purchase(
         }
 
         val transitionRule = mapOf(
-            PurchaseStatus.PENDING   to setOf(PurchaseStatus.CANCELLED, PurchaseStatus.CONFIRMED),
+            PurchaseStatus.PENDING to setOf(PurchaseStatus.CANCELLED, PurchaseStatus.CONFIRMED),
             PurchaseStatus.CONFIRMED to setOf(PurchaseStatus.SUCCESS, PurchaseStatus.CANCELLED),
             PurchaseStatus.CANCELLED to emptySet(),
-            PurchaseStatus.SUCCESS   to emptySet()
+            PurchaseStatus.SUCCESS to emptySet()
         )
 
         require(transitionRule[this.status]?.contains(status) == true) {
@@ -60,89 +65,26 @@ class Purchase(
         this.status = status
     }
 
-    fun toEntity(): PurchaseEntity {
-        return PurchaseEntity(
-            id = this.id ?: UUID.randomUUID().toString(),
-            user = this.user,
-            product = this.product,
-            productType = this.productType,
-            totalPrice = this.totalPrice,
-            quantity = this.quantity,
-            reservationDt = this.reservationDt,
-            status = status,
-            requestMessage = this.requestMessage
-        )
-    }
-
     companion object {
         fun create(
-            createPurchaseRequest: CreatePurchaseRequest,
-            userEntity: UserEntity,
-            productEntity: ProductEntity
+            userId: String,
+            productId: String,
+            productType: ProductType,
+            price: BigInteger,
+            quantity: Int,
+            reservationDt: LocalDateTime?,
+            message: String?
         ): Purchase {
             return Purchase(
                 id = UUID.randomUUID().toString(),
-                user = userEntity,
-                product = productEntity,
-                productType = productEntity.productType,
-                totalPrice = productEntity.price.multiply(createPurchaseRequest.quantity.toBigInteger()),
-                quantity = createPurchaseRequest.quantity,
-                reservationDt = createPurchaseRequest.reservationDt,
+                userId = userId,
+                productId = productId,
+                productType = productType,
+                totalPrice = price.multiply(quantity.toBigInteger()),
+                quantity = quantity,
+                reservationDt = reservationDt,
                 status = PurchaseStatus.PENDING,
-                requestMessage = createPurchaseRequest.requestMessage
-            )
-        }
-
-        fun from(purchaseEntity: PurchaseEntity): Purchase {
-            return Purchase(
-                id = purchaseEntity.id,
-                user = purchaseEntity.user,
-                product = purchaseEntity.product,
-                productType = purchaseEntity.productType,
-                totalPrice = purchaseEntity.totalPrice,
-                quantity = purchaseEntity.quantity,
-                reservationDt = purchaseEntity.reservationDt,
-                status = purchaseEntity.status,
-                requestMessage = purchaseEntity.requestMessage
-            )
-        }
-
-        fun toResponse(purchaseEntity: PurchaseEntity): PurchaseResponse {
-            return PurchaseResponse(
-                id = purchaseEntity.id,
-                productId = purchaseEntity.product.id,
-                productType = purchaseEntity.productType,
-                totalPrice = purchaseEntity.totalPrice,
-                quantity = purchaseEntity.quantity,
-                reservationDt = purchaseEntity.reservationDt,
-                status = purchaseEntity.status,
-                requestMessage = purchaseEntity.requestMessage
-            )
-        }
-
-        fun toDetailResponseBySeller(purchaseEntity: PurchaseEntity): GetPurchaseDetailResponse {
-            return GetPurchaseDetailResponse(
-                id = purchaseEntity.id,
-                user = User.toResponse(purchaseEntity.user),
-                product = Product.toResponse(purchaseEntity.product),
-                totalPrice = purchaseEntity.totalPrice,
-                quantity = purchaseEntity.quantity,
-                reservationDt = purchaseEntity.reservationDt,
-                status = purchaseEntity.status,
-                requestMessage = purchaseEntity.requestMessage
-            )
-        }
-
-        fun toDetailResponseByUser(purchaseEntity: PurchaseEntity): GetPurchaseDetailResponse {
-            return GetPurchaseDetailResponse(
-                id = purchaseEntity.id,
-                user = User.toResponse(purchaseEntity.user),
-                product = Product.toResponse(purchaseEntity.product),
-                totalPrice = purchaseEntity.totalPrice,
-                quantity = purchaseEntity.quantity,
-                reservationDt = purchaseEntity.reservationDt,
-                status = purchaseEntity.status,
-                requestMessage = purchaseEntity.requestMessage
+                requestMessage = message
             )
         }
     }

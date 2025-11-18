@@ -1,8 +1,6 @@
 package com.nearpick.app.domain.user.entity
 
 import com.nearpick.app.common.constant.Role
-import com.nearpick.app.domain.user.dto.CreateUserRequest
-import com.nearpick.app.domain.user.dto.UserResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners

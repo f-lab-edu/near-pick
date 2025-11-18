@@ -8,7 +8,7 @@ import java.math.BigInteger
 import java.time.LocalDateTime
 
 data class GetProductDetailResponse(
-    val id: String,
+    val id: String? = null,
     val seller: UserResponse,
     val brand: BrandResponse,
     val name: String,
@@ -17,5 +17,5 @@ data class GetProductDetailResponse(
     val stock: Int? = null,
     val productType: ProductType,
     val reservationDeadline: LocalDateTime? = null,
-    val status: ProductStatus
+    val status: ProductStatus? = null
 )

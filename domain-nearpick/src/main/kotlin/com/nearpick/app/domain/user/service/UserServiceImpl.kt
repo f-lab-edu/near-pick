@@ -13,23 +13,27 @@ import com.nearpick.app.domain.user.dto.CreateUserRequest
 import com.nearpick.app.domain.user.dto.UpdateUserRequest
 import com.nearpick.app.domain.user.dto.UserPrincipalResponse
 import com.nearpick.app.domain.user.dto.UserResponse
-import com.nearpick.app.domain.user.entity.UserEntity
+import com.nearpick.app.domain.user.mapper.UserMapper
+import com.nearpick.app.domain.user.mapper.UserResponseMapper
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @Service
 @Transactional(readOnly = false)
 open class UserServiceImpl(
     private val userRepository: UserRepository,
-    private val passwordMatcher: PasswordMatcher
+    private val passwordMatcher: PasswordMatcher,
+    private val userMapper: UserMapper,
+    private val userResponseMapper: UserResponseMapper,
 ) : UserService {
     override fun loadUserByUsername(id: String): UserPrincipalResponse {
-        val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
+        val entity = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
-        return User.toPrincipalResponse(user)
+        val user = userMapper.toDomain(entity)
+
+        return userResponseMapper.toPrincipalResponse(user)
 
     }
 
@@ -56,8 +60,11 @@ open class UserServiceImpl(
         checkEmail(request.email)
         checkNickname(request.nickname)
 
-        val createdUserEntity = user.toEntity()
-        return User.toResponse(userRepository.save(createdUserEntity))
+        val entity = userMapper.toEntity(user)
+        userRepository.save(entity)
+
+        val savedUser = userMapper.toDomain(entity)
+        return userResponseMapper.toResponse(savedUser)
     }
 
     @Transactional(readOnly = true)
@@ -82,25 +89,40 @@ open class UserServiceImpl(
 
     @Transactional(readOnly = true)
     override fun getUserById(id: String): UserResponse {
-        val user = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
+        val entity = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
 
-        return User.toResponse(user)
+        val user = userMapper.toDomain(entity)
+        return userResponseMapper.toResponse(user)
     }
 
     override fun updateUser(id: String, request: UpdateUserRequest): UserResponse {
         val newEmail = request.email
-        if (!newEmail.isNullOrBlank()) { checkEmail(newEmail) }
+        if (!newEmail.isNullOrBlank()) {
+            checkEmail(newEmail)
+        }
 
         val newNickname = request.nickname
-        if (!newNickname.isNullOrBlank()) { checkNickname(newNickname) }
+        if (!newNickname.isNullOrBlank()) {
+            checkNickname(newNickname)
+        }
 
-        val userEntity = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
+        val entity = userRepository.findById(id).getOrElse { throw UserNotFoundException(id) }
+        val user = userMapper.toDomain(entity)
 
-        val user = User.from(userEntity)
+        user.update(
+            newEmail,
+            newNickname,
+            request.profileImageUrl,
+            request.phoneNumber,
+            request.accountHolderName,
+            request.bankName,
+            request.accountNumber
+        )
 
-        user.update(request)
+        val updatedEntity = userMapper.toEntity(user)
+        userRepository.save(updatedEntity)
 
-        return User.toResponse(userRepository.save(user.toEntity()))
+        return userResponseMapper.toResponse(user)
     }
 
     override fun deleteUser(id: String) {

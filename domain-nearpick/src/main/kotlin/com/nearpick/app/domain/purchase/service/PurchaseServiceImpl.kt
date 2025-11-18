@@ -5,6 +5,8 @@ import com.nearpick.app.common.exception.InvalidRoleException
 import com.nearpick.app.common.exception.PurchaseNotFoundException
 import com.nearpick.app.common.exception.ProductNotFoundException
 import com.nearpick.app.common.exception.UserNotFoundException
+import com.nearpick.app.domain.brand.mapper.BrandMapper
+import com.nearpick.app.domain.brand.mapper.BrandResponseMapper
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
@@ -13,7 +15,13 @@ import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 import com.nearpick.app.domain.purchase.entity.PurchaseEntity
 import com.nearpick.app.domain.purchase.repository.PurchaseRepository
 import com.nearpick.app.domain.product.entity.ProductEntity
+import com.nearpick.app.domain.product.mapper.ProductMapper
+import com.nearpick.app.domain.product.mapper.ProductResponseMapper
 import com.nearpick.app.domain.product.repository.ProductRepository
+import com.nearpick.app.domain.purchase.mapper.PurchaseMapper
+import com.nearpick.app.domain.purchase.mapper.PurchaseResponseMapper
+import com.nearpick.app.domain.user.mapper.UserMapper
+import com.nearpick.app.domain.user.mapper.UserResponseMapper
 import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -25,82 +33,114 @@ import kotlin.jvm.optionals.getOrElse
 open class PurchaseServiceImpl(
     private val purchaseRepository: PurchaseRepository,
     private val productRepository: ProductRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val purchaseMapper: PurchaseMapper,
+    private val purchaseResponseMapper: PurchaseResponseMapper,
+    private val productMapper: ProductMapper,
+    private val productResponseMapper: ProductResponseMapper,
+    private val userMapper: UserMapper,
+    private val userResponseMapper: UserResponseMapper
 ) : PurchaseService {
     override fun createPurchase(request: CreatePurchaseRequest, userId: String)
         : PurchaseResponse {
-        val productEntity = getProduct(request.productId)
-        val userEntity = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
 
         //TODO: make Logic
-        val purchase = Purchase.create(request, userEntity, productEntity)
+        val purchase = Purchase.create(
+            userId,
+            request.productId,
+            request.productType,
+            request.price,
+            request.quantity,
+            request.reservationDt,
+            request.requestMessage
+        )
 
-        return Purchase.toResponse(purchaseRepository.save(purchase.toEntity()))
+        val entity = purchaseMapper.toEntity(purchase)
+        purchaseRepository.save(entity)
+
+        val savedPurchases = purchaseMapper.toDomain(entity)
+        return purchaseResponseMapper.toResponse(savedPurchases)
     }
 
     @Transactional(readOnly = true)
     override fun findAllPurchaseBySeller(userId: String)
         : List<PurchaseResponse> {
-        return purchaseRepository.findAllByProduct_Seller_Id(userId).map { Purchase.toResponse(it) }
+        return purchaseRepository.findAllByProduct_Seller_Id(userId)
+            .map { purchaseResponseMapper.toResponse(purchaseMapper.toDomain(it)) }
     }
 
     @Transactional(readOnly = true)
     override fun findAllPurchaseByUser(userId: String)
         : List<PurchaseResponse> {
-        return purchaseRepository.findAllByUserId(userId).map { Purchase.toResponse(it) }
+        return purchaseRepository.findAllByUserId(userId)
+            .map { purchaseResponseMapper.toResponse(purchaseMapper.toDomain(it)) }
     }
 
     @Transactional(readOnly = true)
     override fun findPurchaseDetailByUser(id: String, userId: String)
         : GetPurchaseDetailResponse {
-        val purchaseEntity = getPurchaseByUser(id, userId)
+        val entity = purchaseRepository.findByIdAndUserId(id, userId).orElse(null)
+            ?: throw PurchaseNotFoundException(id, userId)
 
-        return Purchase.toDetailResponseByUser(purchaseEntity)
+        val purchase = purchaseMapper.toDomain(entity)
+
+        val user = userMapper.toDomain(entity.user)
+        val userResponse = userResponseMapper.toResponse(user)
+
+        val product = productMapper.toDomain(entity.product)
+        val productResponse = productResponseMapper.toResponse(product)
+
+        return purchaseResponseMapper.toDetailResponseByUser(purchase, userResponse, productResponse)
     }
 
     @Transactional(readOnly = true)
     override fun findPurchaseDetailBySeller(id: String, userId: String)
         : GetPurchaseDetailResponse {
-        val purchaseEntity = getPurchaseBySeller(id, userId)
+        val entity = purchaseRepository.findByIdAndProduct_Seller_Id(id, userId).orElse(null)
+            ?: throw PurchaseNotFoundException(id, userId)
 
-        return Purchase.toDetailResponseBySeller(purchaseEntity)
+        val purchase = purchaseMapper.toDomain(entity)
+
+        val user = userMapper.toDomain(entity.user)
+        val userResponse = userResponseMapper.toResponse(user)
+
+        val product = productMapper.toDomain(entity.product)
+        val productResponse = productResponseMapper.toResponse(product)
+
+        return purchaseResponseMapper.toDetailResponseBySeller(purchase, userResponse, productResponse)
     }
 
     override fun updatePurchase(id: String, userId: String, request: UpdatePurchaseRequest)
         : PurchaseResponse {
-
-        val purchaseEntity = getPurchaseBySeller(id, userId)
-        val purchase = Purchase.from(purchaseEntity)
+        val entity = purchaseRepository.findByIdAndProduct_Seller_Id(id, userId).orElse(null)
+            ?: throw PurchaseNotFoundException(id, userId)
+        val purchase = purchaseMapper.toDomain(entity)
 
         //TODO: 선착순 구매, 예약 기능에 영향을 주므로 개발 이후 구현 예정
 //        purchase.update(request)
 
-        return Purchase.toResponse(purchaseRepository.save(purchase.toEntity()))
+        val updatedEntity = purchaseMapper.toEntity(purchase)
+        purchaseRepository.save(updatedEntity)
+
+        return purchaseResponseMapper.toResponse(purchase)
     }
 
     override fun updatePurchaseStatus(id: String, userId: String, userRole: Role, request: UpdatePurchaseStatusRequest)
         : PurchaseResponse {
-        val purchaseEntity = when (userRole) {
-            Role.SELLER -> getPurchaseByUser(id, userId)
-            Role.USER -> getPurchaseByUser(id, userId)
+        val entity = when (userRole) {
+            Role.SELLER -> purchaseRepository.findByIdAndProduct_Seller_Id(id, userId).orElse(null)
+                ?: throw PurchaseNotFoundException(id, userId)
+            Role.USER -> purchaseRepository.findByIdAndUserId(id, userId).orElse(null)
+                ?: throw PurchaseNotFoundException(id, userId)
             else -> throw InvalidRoleException("Unsupported role: $userRole")
         }
-        val purchase = Purchase.from(purchaseEntity)
+        val purchase = purchaseMapper.toDomain(entity)
 
         purchase.updateStatus(userRole, request.status)
 
-        return Purchase.toResponse(purchaseRepository.save(purchase.toEntity()))
+        val updatedEntity = purchaseMapper.toEntity(purchase)
+        purchaseRepository.save(updatedEntity)
+
+        return purchaseResponseMapper.toResponse(purchase)
     }
-
-    private fun getProduct(id: String): ProductEntity =
-        productRepository.findById(id).orElse(null)
-            ?: throw ProductNotFoundException(id, null)
-
-    private fun getPurchaseBySeller(id: String, userId: String): PurchaseEntity =
-        purchaseRepository.findByIdAndProduct_Seller_Id(id, userId).orElse(null)
-            ?: throw PurchaseNotFoundException(id, userId)
-
-    private fun getPurchaseByUser(id: String, userId: String): PurchaseEntity =
-        purchaseRepository.findByIdAndUserId(id, userId).orElse(null)
-            ?: throw PurchaseNotFoundException(id, userId)
 }
