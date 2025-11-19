@@ -35,7 +35,7 @@ class Purchase(
     fun updateStatus(userRole: Role, status: PurchaseStatus) {
         val allowedByRole = mapOf(
             Role.USER to setOf(PurchaseStatus.CANCELLED),
-            Role.SELLER to setOf(PurchaseStatus.CONFIRMED, PurchaseStatus.CANCELLED, PurchaseStatus.SUCCESS)
+            Role.SELLER to setOf(PurchaseStatus.PENDING, PurchaseStatus.CONFIRMED, PurchaseStatus.CANCELLED, PurchaseStatus.SUCCESS)
         )
 
         require(allowedByRole[userRole]?.contains(status) == true) {
@@ -44,7 +44,7 @@ class Purchase(
 
         val transitionRule = mapOf(
             PurchaseStatus.PENDING to setOf(PurchaseStatus.CANCELLED, PurchaseStatus.CONFIRMED),
-            PurchaseStatus.CONFIRMED to setOf(PurchaseStatus.SUCCESS, PurchaseStatus.CANCELLED),
+            PurchaseStatus.CONFIRMED to setOf(PurchaseStatus.PENDING, PurchaseStatus.SUCCESS, PurchaseStatus.CANCELLED),
             PurchaseStatus.CANCELLED to emptySet(),
             PurchaseStatus.SUCCESS to emptySet()
         )
