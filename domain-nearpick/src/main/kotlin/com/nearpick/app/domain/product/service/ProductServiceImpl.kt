@@ -50,8 +50,7 @@ open class ProductServiceImpl(
         val entity = productMapper.toEntity(product)
         productRepository.save(entity)
 
-        val savedProduct = productMapper.toDomain(entity)
-        return productResponseMapper.toResponse(savedProduct)
+        return productResponseMapper.toResponse(product)
     }
 
     @Transactional(readOnly = true)
@@ -92,6 +91,7 @@ open class ProductServiceImpl(
             request.productType,
             request.reservationDeadline
         )
+
         val updatedEntity = productMapper.toEntity(product)
         productRepository.save(updatedEntity)
 

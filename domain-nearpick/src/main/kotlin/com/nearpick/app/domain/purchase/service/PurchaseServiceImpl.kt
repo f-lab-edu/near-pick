@@ -3,37 +3,26 @@ package com.nearpick.app.domain.purchase.service
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.InvalidRoleException
 import com.nearpick.app.common.exception.PurchaseNotFoundException
-import com.nearpick.app.common.exception.ProductNotFoundException
-import com.nearpick.app.common.exception.UserNotFoundException
-import com.nearpick.app.domain.brand.mapper.BrandMapper
-import com.nearpick.app.domain.brand.mapper.BrandResponseMapper
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
-import com.nearpick.app.domain.purchase.entity.PurchaseEntity
 import com.nearpick.app.domain.purchase.repository.PurchaseRepository
-import com.nearpick.app.domain.product.entity.ProductEntity
 import com.nearpick.app.domain.product.mapper.ProductMapper
 import com.nearpick.app.domain.product.mapper.ProductResponseMapper
-import com.nearpick.app.domain.product.repository.ProductRepository
 import com.nearpick.app.domain.purchase.mapper.PurchaseMapper
 import com.nearpick.app.domain.purchase.mapper.PurchaseResponseMapper
 import com.nearpick.app.domain.user.mapper.UserMapper
 import com.nearpick.app.domain.user.mapper.UserResponseMapper
-import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrElse
 
 
 @Service
 @Transactional(readOnly = false)
 open class PurchaseServiceImpl(
     private val purchaseRepository: PurchaseRepository,
-    private val productRepository: ProductRepository,
-    private val userRepository: UserRepository,
     private val purchaseMapper: PurchaseMapper,
     private val purchaseResponseMapper: PurchaseResponseMapper,
     private val productMapper: ProductMapper,
@@ -58,8 +47,7 @@ open class PurchaseServiceImpl(
         val entity = purchaseMapper.toEntity(purchase)
         purchaseRepository.save(entity)
 
-        val savedPurchases = purchaseMapper.toDomain(entity)
-        return purchaseResponseMapper.toResponse(savedPurchases)
+        return purchaseResponseMapper.toResponse(purchase)
     }
 
     @Transactional(readOnly = true)

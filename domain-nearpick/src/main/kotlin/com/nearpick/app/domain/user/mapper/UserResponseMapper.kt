@@ -2,7 +2,6 @@ package com.nearpick.app.domain.user.mapper
 
 import com.nearpick.app.domain.user.dto.UserPrincipalResponse
 import com.nearpick.app.domain.user.dto.UserResponse
-import com.nearpick.app.domain.user.entity.UserEntity
 import com.nearpick.app.domain.user.service.User
 import org.springframework.stereotype.Component
 

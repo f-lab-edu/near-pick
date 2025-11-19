@@ -1,8 +1,5 @@
 package com.nearpick.app.domain.brand.entity
 
-import com.nearpick.app.domain.brand.dto.BrandResponse
-import com.nearpick.app.domain.brand.dto.CreateBrandRequest
-import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
 import com.nearpick.app.domain.user.entity.UserEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -18,7 +15,6 @@ import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Entity
 @Table(name = "Brand")

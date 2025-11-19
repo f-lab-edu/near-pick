@@ -3,11 +3,6 @@ package com.nearpick.app.domain.user.service
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.InvalidPhoneNumberException
 import com.nearpick.app.common.validator.Validator
-import com.nearpick.app.domain.user.dto.UpdateUserRequest
-import com.nearpick.app.domain.user.dto.UserPrincipalResponse
-import com.nearpick.app.domain.user.dto.UserResponse
-import com.nearpick.app.domain.user.entity.UserEntity
-import java.util.*
 
 class User(
     val id: String? = null,

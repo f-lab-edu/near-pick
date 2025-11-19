@@ -3,7 +3,6 @@ package com.nearpick.app.domain.purchase.mapper
 import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
-import com.nearpick.app.domain.purchase.entity.PurchaseEntity
 import com.nearpick.app.domain.purchase.service.Purchase
 import com.nearpick.app.domain.user.dto.UserResponse
 import org.springframework.stereotype.Component

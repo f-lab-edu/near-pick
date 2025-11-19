@@ -1,6 +1,5 @@
 package com.nearpick.app.domain.purchase.mapper
 
-import com.nearpick.app.domain.brand.repository.BrandRepository
 import com.nearpick.app.domain.product.repository.ProductRepository
 import com.nearpick.app.domain.purchase.entity.PurchaseEntity
 import com.nearpick.app.domain.purchase.service.Purchase

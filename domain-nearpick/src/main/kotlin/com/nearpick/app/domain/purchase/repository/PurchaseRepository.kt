@@ -1,6 +1,5 @@
 package com.nearpick.app.domain.purchase.repository
 
-import com.nearpick.app.domain.product.entity.ProductEntity
 import com.nearpick.app.domain.purchase.entity.PurchaseEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.Optional

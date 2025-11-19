@@ -3,20 +3,16 @@ package com.nearpick.app.domain.brand.service
 import com.nearpick.app.common.exception.BrandAlreadyExistsException
 import com.nearpick.app.domain.brand.dto.BrandResponse
 import com.nearpick.app.domain.brand.dto.CreateBrandRequest
-import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.brand.repository.BrandRepository
 import com.nearpick.app.common.exception.BrandNotFoundException
-import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
 import com.nearpick.app.domain.brand.dto.UpdateBrandRequest
 import com.nearpick.app.domain.brand.mapper.BrandMapper
 import com.nearpick.app.domain.brand.mapper.BrandResponseMapper
 import com.nearpick.app.domain.user.mapper.UserMapper
 import com.nearpick.app.domain.user.mapper.UserResponseMapper
-import com.nearpick.app.domain.user.repository.UserRepository
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrElse
 
 @Service
 @Transactional(readOnly = false)
@@ -49,8 +45,7 @@ open class BrandServiceImpl(
         val entity = brandMapper.toEntity(brand)
         brandRepository.save(entity)
 
-        val savedBrand = brandMapper.toDomain(entity)
-        return brandResponseMapper.toResponse(savedBrand)
+        return brandResponseMapper.toResponse(brand)
     }
 
     @Transactional(readOnly = true)
