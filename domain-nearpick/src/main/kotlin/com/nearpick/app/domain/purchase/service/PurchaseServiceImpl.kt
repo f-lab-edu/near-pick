@@ -117,9 +117,11 @@ open class PurchaseServiceImpl(
         : PurchaseResponse {
         val entity = purchaseRepository.findById(id).orElse(null)
             ?: throw PurchaseNotFoundException(id, userId)
-        val purchase = purchaseMapper.toDomain(entity)
 
-        purchase.verifyAccess(userId, userRole)
+        val purchase = purchaseMapper.toDomain(entity)
+        val product = productMapper.toDomain(entity.product)
+
+        purchase.verifyAccess(userId, userRole, product.sellerId)
         purchase.updateStatus(userRole, request.status)
 
         val updatedEntity = purchaseMapper.toEntity(purchase)

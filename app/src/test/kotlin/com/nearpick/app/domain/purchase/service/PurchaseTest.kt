@@ -90,6 +90,49 @@ class PurchaseTest : BehaviorSpec({
         }
     }
 
+
+    Given("verifyAccess()를 통해 구매 접근 권한을 검증한다.") {
+        val sellerId = "seller-id"
+
+        When("USER가 자신의 주문에 접근하면") {
+            val ownerId = userId
+            val purchase = newPurchase()
+
+            Then("접근이 허용되어야 한다") {
+                purchase.verifyAccess(ownerId, Role.USER, sellerId = sellerId)
+            }
+        }
+
+        When("SELLER가 자신의 상품 주문에 접근하면") {
+            val purchase = newPurchase()
+
+            Then("접근이 허용되어야 한다") {
+                purchase.verifyAccess(sellerId, Role.SELLER, sellerId = sellerId)
+            }
+        }
+
+        When("USER가 다른 사람의 주문에 접근하면") {
+            val purchase = newPurchase()
+
+            Then("InvalidRoleException이 발생한다") {
+                shouldThrow<com.nearpick.app.common.exception.InvalidRoleException> {
+                    purchase.verifyAccess("other-user-id", Role.USER, sellerId = sellerId)
+                }
+            }
+        }
+
+        When("SELLER가 자신의 상품이 아닌 주문에 접근하면") {
+            val purchase = newPurchase()
+
+            Then("InvalidRoleException이 발생해야 한다") {
+                shouldThrow<com.nearpick.app.common.exception.InvalidRoleException> {
+                    purchase.verifyAccess("other-seller-id", Role.SELLER, sellerId = sellerId)
+                }
+            }
+        }
+    }
+
+
     Given("updateStatus()를 통해 USER와 SELLER가 상태 변경을 진행한다.") {
         When("USER가 CANCELLED로 상태 변경 시도할 때") {
             val purchase = newPurchase()

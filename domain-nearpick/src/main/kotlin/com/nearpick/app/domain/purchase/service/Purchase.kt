@@ -6,6 +6,7 @@ import com.nearpick.app.common.exception.PurchaseStatusInvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidTransitionException
 import com.nearpick.app.domain.purchase.enum.PurchaseStatus
 import com.nearpick.app.domain.product.enum.ProductType
+import com.nearpick.app.domain.product.service.Product
 import java.math.BigInteger
 import java.time.LocalDateTime
 import java.util.UUID
@@ -33,8 +34,8 @@ class Purchase(
         this.requestMessage = message
     }
 
-    fun verifyAccess(userId: String, role: Role) {
-        val isSeller = role == Role.SELLER && this.userId == userId
+    fun verifyAccess(userId: String, role: Role, sellerId: String) {
+        val isSeller = role == Role.SELLER && sellerId == userId
         val isUser = role == Role.USER && this.userId == userId
 
         if (!isSeller && !isUser) {
