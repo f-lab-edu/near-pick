@@ -1,13 +1,9 @@
 package com.nearpick.app.domain.product.entity
 
 import com.nearpick.app.domain.brand.entity.BrandEntity
-import com.nearpick.app.domain.brand.service.Brand
-import com.nearpick.app.domain.product.dto.CreateProductRequest
-import com.nearpick.app.domain.product.dto.GetProductDetailResponse
-import com.nearpick.app.domain.product.dto.ProductResponse
+import com.nearpick.app.domain.product.enum.ProductStatus
 import com.nearpick.app.domain.product.enum.ProductType
 import com.nearpick.app.domain.user.entity.UserEntity
-import com.nearpick.app.domain.user.service.User
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -25,10 +21,9 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.math.BigInteger
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Entity
-@Table(name = "Product")
+@Table(name = "product")
 @EntityListeners(AuditingEntityListener::class)
 class ProductEntity(
     @Id
@@ -56,7 +51,8 @@ class ProductEntity(
 
     var reservationDeadline: LocalDateTime? = null,
 
-    var isActive: Boolean? = true,
+    @Enumerated(EnumType.STRING)
+    var status: ProductStatus,
 
     @CreatedDate
     var createdAt: LocalDateTime? = null,

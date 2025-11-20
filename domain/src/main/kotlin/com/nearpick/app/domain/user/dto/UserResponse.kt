@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.user.dto
 
 data class UserResponse(
-    val id: String,
+    val id: String?,
     val email: String,
     val nickname: String,
     val profileImageUrl: String?,

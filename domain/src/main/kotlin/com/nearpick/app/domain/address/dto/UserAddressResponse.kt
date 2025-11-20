@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.address.dto
 
 data class UserAddressResponse(
-    val id: String,
+    val id: String?,
     val name: String?,
     val receiverName: String?,
     val phoneNumber: String?,

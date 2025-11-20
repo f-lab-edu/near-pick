@@ -2,35 +2,44 @@ package com.nearpick.app.domain.product.service
 
 import com.nearpick.app.common.exception.BrandNotFoundException
 import com.nearpick.app.common.exception.ProductNotFoundException
-import com.nearpick.app.common.exception.UserNotFoundException
-import com.nearpick.app.domain.brand.entity.BrandEntity
+import com.nearpick.app.common.exception.ProductReservationExistsException
+import com.nearpick.app.domain.brand.mapper.BrandMapper
+import com.nearpick.app.domain.brand.mapper.BrandResponseMapper
 import com.nearpick.app.domain.brand.repository.BrandRepository
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
 import com.nearpick.app.domain.product.dto.UpdateProductRequest
-import com.nearpick.app.domain.product.entity.ProductEntity
+import com.nearpick.app.domain.product.enum.ProductStatus
+import com.nearpick.app.domain.product.mapper.ProductMapper
+import com.nearpick.app.domain.product.mapper.ProductResponseMapper
 import com.nearpick.app.domain.product.repository.ProductRepository
-import com.nearpick.app.domain.user.repository.UserRepository
+import com.nearpick.app.domain.purchase.repository.PurchaseRepository
+import com.nearpick.app.domain.user.mapper.UserMapper
+import com.nearpick.app.domain.user.mapper.UserResponseMapper
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrElse
 
 @Service
 @Transactional(readOnly = false)
 open class ProductServiceImpl(
-    private val userRepository: UserRepository,
     private val brandRepository: BrandRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val purchaseRepository: PurchaseRepository,
+    private val productMapper: ProductMapper,
+    private val productResponseMapper: ProductResponseMapper,
+    private val brandMapper: BrandMapper,
+    private val brandResponseMapper: BrandResponseMapper,
+    private val userMapper: UserMapper,
+    private val userResponseMapper: UserResponseMapper
 ) : ProductService {
 
     override fun createProduct(request: CreateProductRequest, userId: String): ProductResponse {
-        val brand = getBrand(request.brandId, userId)
-        val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
+        if (!brandRepository.existsById(request.brandId)) throw BrandNotFoundException(request.brandId, userId)
 
         val product = Product(
-            seller = user,
-            brandEntity = brand,
+            sellerId = userId,
+            brandId = request.brandId,
             name = request.name,
             description = request.description,
             price = request.price,
@@ -38,49 +47,69 @@ open class ProductServiceImpl(
             productType = request.productType,
             reservationDeadline = request.reservationDeadline
         )
+        val entity = productMapper.toEntity(product)
+        productRepository.save(entity)
 
-        return Product.toResponse(productRepository.save(product.toEntity()))
+        return productResponseMapper.toResponse(product)
     }
 
     @Transactional(readOnly = true)
     override fun findAllProductByBrand(brandId: String): List<ProductResponse> {
-        val brand = getBrand(brandId)
+        if (!brandRepository.existsById(brandId)) throw BrandNotFoundException(brandId, null)
 
-        return productRepository.findAllByBrandEntity(brand).map { Product.toResponse(it) }
+        return productRepository.findAllByBrandEntity_Id(brandId)
+            .map { productResponseMapper.toResponse(productMapper.toDomain(it)) }
     }
 
     @Transactional(readOnly = true)
     override fun findProductDetail(id: String): GetProductDetailResponse {
-        val product = getProduct(id)
+        val entity = productRepository.findById(id).orElse(null)
+            ?: throw ProductNotFoundException(id, null)
 
-        return Product.toDetailResponse(product)
+        val product = productMapper.toDomain(entity)
+
+        val user = userMapper.toDomain(entity.seller)
+        val userResponse = userResponseMapper.toResponse(user)
+
+        val brand = brandMapper.toDomain(entity.brandEntity)
+        val brandResponse = brandResponseMapper.toResponse(brand)
+
+        return productResponseMapper.toDetailResponse(product, userResponse, brandResponse)
     }
 
     override fun updateProduct(id: String, userId: String, request: UpdateProductRequest): ProductResponse {
-        val productEntity = getProduct(id, userId)
-        val product = Product.from(productEntity)
+        val entity = productRepository.findByIdAndSellerId(id, userId)
+            ?: throw ProductNotFoundException(id, userId)
 
-        product.update(request)
+        val product = productMapper.toDomain(entity)
 
-        return Product.toResponse(productRepository.save(product.toEntity()))
+        product.update(
+            request.name,
+            request.description,
+            request.price,
+            request.stock,
+            request.productType,
+            request.reservationDeadline
+        )
+
+        val updatedEntity = productMapper.toEntity(product)
+        productRepository.save(updatedEntity)
+
+        return productResponseMapper.toResponse(product)
     }
 
     override fun deleteProduct(id: String, userId: String) {
-        val product = getProduct(id, userId)
+        if (purchaseRepository.existsByProduct_Id(id)) {
+            throw ProductReservationExistsException(id)
+        }
 
-        productRepository.delete(product)
+        val entity = productRepository.findByIdAndSellerId(id, userId)
+            ?: throw ProductNotFoundException(id, userId)
+
+        val product = productMapper.toDomain(entity)
+
+        product.updateStatus(ProductStatus.DELETE)
+
+        productRepository.save(entity)
     }
-
-    private fun getBrand(brandId: String): BrandEntity =
-        brandRepository.findById(brandId).getOrElse { throw BrandNotFoundException(brandId, null) }
-
-    private fun getBrand(brandId: String, userId: String): BrandEntity =
-        brandRepository.findByIdAndOwnerUserEntityId(brandId, userId) ?: throw BrandNotFoundException(brandId, userId)
-
-    private fun getProduct(id: String): ProductEntity =
-        productRepository.findById(id).orElse(null)
-            ?: throw ProductNotFoundException(id, null)
-
-    private fun getProduct(id: String, userId: String): ProductEntity =
-        productRepository.findByIdAndSellerId(id, userId) ?: throw ProductNotFoundException(id, userId)
 }

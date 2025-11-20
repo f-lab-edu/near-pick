@@ -1,7 +1,7 @@
 package com.nearpick.app.domain.brand.dto
 
 data class BrandResponse(
-    val id: String,
+    val id: String?,
     val name: String,
     val description: String? = null,
     val businessRegistrationNumber: String,

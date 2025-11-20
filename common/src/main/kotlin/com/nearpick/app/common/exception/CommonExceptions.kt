@@ -1,5 +1,7 @@
 package com.nearpick.app.common.exception
 
+import com.nearpick.app.common.constant.Role
+
 
 // 사용자 관련 예외
 class UserNotFoundException(userId: String) : BaseException(
@@ -123,6 +125,37 @@ class BrandAlreadyExistsException(brand: String) : BaseException(
 // 상품 정보 관련 예외
 class ProductNotFoundException(productId: String?, userId: String?) : BaseException(
     code = "PRODUCT_NOT_FOUND",
-    message = "사용자의 상품 정보가 잘못되었습니다. (productId=$productId)",
+    message = "판매자의 상품 정보가 잘못되었습니다. (productId=$productId, userId=$userId)",
+    category = ErrorCategory.NOT_FOUND
+)
+
+class ProductReservationExistsException(productId: String?) : BaseException(
+    code = "PRODUCT_RESERVATION_EXISTS",
+    message = "사용자의 상품의 구매 정보가 있어 삭제 및 inactive 처리가 불가능합니다. 먼저 구매 취소를 진행해주세요. (productId=$productId)",
+    category = ErrorCategory.VALIDATION
+)
+
+class ProductStatusActiveException(productId: String?) : BaseException(
+    code = "PRODUCT_STATUS_ACTIVE",
+    message = "사용자의 상품이 활성화되어 있어 수정할 수 없습니다. (productId=$productId)",
+    category = ErrorCategory.VALIDATION
+)
+
+// 주문 정보 관련 예외
+class PurchaseNotFoundException(purchaseId: String?, userId: String?) : BaseException(
+    code = "PURCHASE_NOT_FOUND",
+    message = "주문 정보가 잘못되었습니다. (purchaseId=$purchaseId, userId=$userId)",
+    category = ErrorCategory.NOT_FOUND
+)
+
+class PurchaseStatusInvalidTransitionException(curStatus: String?, requestedStatus: String?) : BaseException(
+    code = "PURCHASE_STATUS_INVALID_TRANSITION",
+    message = "요청된 상태로 주문 상태 변경이 불가합니다. (curStatus=$curStatus, requestedStatus=$requestedStatus)",
+    category = ErrorCategory.NOT_FOUND
+)
+
+class PurchaseStatusInvalidRoleException(role: String?, requestedStatus: String?) : BaseException(
+    code = "PURCHASE_STATUS_INVALID_ROLE",
+    message = "주문 상태를 변경할 권한이 없습니다. (role=$Role, requestedStatus=$requestedStatus)",
     category = ErrorCategory.NOT_FOUND
 )

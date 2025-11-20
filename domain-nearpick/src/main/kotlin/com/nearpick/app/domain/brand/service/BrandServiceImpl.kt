@@ -3,30 +3,35 @@ package com.nearpick.app.domain.brand.service
 import com.nearpick.app.common.exception.BrandAlreadyExistsException
 import com.nearpick.app.domain.brand.dto.BrandResponse
 import com.nearpick.app.domain.brand.dto.CreateBrandRequest
-import com.nearpick.app.domain.brand.entity.BrandEntity
 import com.nearpick.app.domain.brand.repository.BrandRepository
 import com.nearpick.app.common.exception.BrandNotFoundException
-import com.nearpick.app.common.exception.UserNotFoundException
 import com.nearpick.app.domain.brand.dto.GetBrandDetailResponse
 import com.nearpick.app.domain.brand.dto.UpdateBrandRequest
-import com.nearpick.app.domain.user.repository.UserRepository
+import com.nearpick.app.domain.brand.mapper.BrandMapper
+import com.nearpick.app.domain.brand.mapper.BrandResponseMapper
+import com.nearpick.app.domain.user.mapper.UserMapper
+import com.nearpick.app.domain.user.mapper.UserResponseMapper
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrElse
 
 @Service
 @Transactional(readOnly = false)
 open class BrandServiceImpl(
-    private val userRepository: UserRepository,
-    private val brandRepository: BrandRepository
+    private val brandRepository: BrandRepository,
+    private val brandMapper: BrandMapper,
+    private val brandResponseMapper: BrandResponseMapper,
+    private val userMapper: UserMapper,
+    private val userResponseMapper: UserResponseMapper
 ) : BrandService {
 
     override fun createBrand(request: CreateBrandRequest, userId: String): BrandResponse {
-        val user = userRepository.findById(userId).getOrElse { throw UserNotFoundException(userId) }
+        if (brandRepository.existsByBusinessRegistrationNumber(request.businessRegistrationNumber)) {
+            throw BrandAlreadyExistsException(request.businessRegistrationNumber)
+        }
 
         val brand = Brand(
             name = request.name,
-            ownerUserEntity = user,
+            ownerUserId = userId,
             description = request.description,
             businessRegistrationNumber = request.businessRegistrationNumber,
             fullAddress = request.fullAddress,
@@ -37,45 +42,57 @@ open class BrandServiceImpl(
             street = request.street
         )
 
-        if (brandRepository.existsByBusinessRegistrationNumber(request.businessRegistrationNumber)) {
-            throw BrandAlreadyExistsException(request.businessRegistrationNumber)
-        }
+        val entity = brandMapper.toEntity(brand)
+        brandRepository.save(entity)
 
-        return Brand.toResponse(brandRepository.save(brand.toEntity()))
+        return brandResponseMapper.toResponse(brand)
     }
 
     @Transactional(readOnly = true)
     override fun findAllBrandByOwnerUser(userId: String): List<BrandResponse> {
-        return brandRepository.findAllByOwnerUserEntityId(userId).map { Brand.toResponse(it) }
+        return brandRepository.findAllByOwnerUserEntityId(userId)
+            .map { brandResponseMapper.toResponse(brandMapper.toDomain(it)) }
     }
 
     @Transactional(readOnly = true)
     override fun findBrandDetail(id: String): GetBrandDetailResponse {
-        val brand = getBrand(id)
+        val entity = brandRepository.findById(id).orElse(null)
+            ?: throw BrandNotFoundException(id, null)
 
-        return Brand.toDetailResponse(brand)
+        val brand = brandMapper.toDomain(entity)
+
+        val user = userMapper.toDomain(entity.ownerUserEntity)
+        val userResponse = userResponseMapper.toResponse(user)
+
+        return brandResponseMapper.toDetailResponse(brand, userResponse)
     }
 
     override fun updateBrand(id: String, userId: String, request: UpdateBrandRequest): BrandResponse {
-        val brandEntity = getBrand(id, userId)
-        val brand = Brand.from(brandEntity)
+        val entity = brandRepository.findByIdAndOwnerUserEntityId(id, userId)
+            ?: throw BrandNotFoundException(id, userId)
 
-        brand.update(request)
+        val brand = brandMapper.toDomain(entity)
 
-        return Brand.toResponse(brandRepository.save(brand.toEntity()))
+        brand.update(
+            request.name,
+            request.description,
+            request.fullAddress,
+            request.addressDetail,
+            request.province,
+            request.district,
+            request.neighborhood,
+            request.street
+        )
+        val updatedEntity = brandMapper.toEntity(brand)
+        brandRepository.save(updatedEntity)
+
+        return brandResponseMapper.toResponse(brand)
     }
 
     override fun deleteBrand(id: String, userId: String) {
-        val brand = getBrand(id, userId)
-
-        brandRepository.delete(brand)
-    }
-
-    private fun getBrand(id: String): BrandEntity =
-        brandRepository.findById(id).orElse(null)
-            ?: throw BrandNotFoundException(id, null)
-
-    private fun getBrand(id: String, userId: String): BrandEntity =
-        brandRepository.findByIdAndOwnerUserEntityId(id, userId)
+        val entity = brandRepository.findByIdAndOwnerUserEntityId(id, userId)
             ?: throw BrandNotFoundException(id, userId)
+
+        brandRepository.delete(entity)
+    }
 }
