@@ -1,6 +1,7 @@
 package com.nearpick.app.domain.purchase.service
 
 import com.nearpick.app.common.constant.Role
+import com.nearpick.app.common.exception.InvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidTransitionException
 import com.nearpick.app.domain.purchase.enum.PurchaseStatus
@@ -30,6 +31,15 @@ class Purchase(
         this.quantity = quantity
         this.reservationDt = reservationDt
         this.requestMessage = message
+    }
+
+    fun verifyAccess(userId: String, role: Role) {
+        val isSeller = role == Role.SELLER && this.userId == userId
+        val isUser = role == Role.USER && this.userId == userId
+
+        if (!isSeller && !isUser) {
+            throw InvalidRoleException(role.name)
+        }
     }
 
     fun updateStatus(userRole: Role, status: PurchaseStatus) {

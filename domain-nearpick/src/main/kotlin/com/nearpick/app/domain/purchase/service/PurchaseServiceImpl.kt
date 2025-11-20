@@ -115,15 +115,11 @@ open class PurchaseServiceImpl(
 
     override fun updatePurchaseStatus(id: String, userId: String, userRole: Role, request: UpdatePurchaseStatusRequest)
         : PurchaseResponse {
-        val entity = when (userRole) {
-            Role.SELLER -> purchaseRepository.findByIdAndProduct_Seller_Id(id, userId).orElse(null)
-                ?: throw PurchaseNotFoundException(id, userId)
-            Role.USER -> purchaseRepository.findByIdAndUserId(id, userId).orElse(null)
-                ?: throw PurchaseNotFoundException(id, userId)
-            else -> throw InvalidRoleException("Unsupported role: $userRole")
-        }
+        val entity = purchaseRepository.findById(id).orElse(null)
+            ?: throw PurchaseNotFoundException(id, userId)
         val purchase = purchaseMapper.toDomain(entity)
 
+        purchase.verifyAccess(userId, userRole)
         purchase.updateStatus(userRole, request.status)
 
         val updatedEntity = purchaseMapper.toEntity(purchase)
