@@ -27,7 +27,8 @@ class ProductMapper(
             price = product.price,
             stock = product.stock,
             productType = product.productType,
-            reservationDeadline = product.reservationDeadline,
+            startDt = product.startDt,
+            endDt = product.endDt,
             status = product.status ?: ProductStatus.ACTIVE
         )
     }
@@ -42,7 +43,8 @@ class ProductMapper(
             price = productEntity.price,
             stock = productEntity.stock,
             productType = productEntity.productType,
-            reservationDeadline = productEntity.reservationDeadline,
+            startDt = productEntity.startDt,
+            endDt = productEntity.endDt,
             status = productEntity.status
         )
     }

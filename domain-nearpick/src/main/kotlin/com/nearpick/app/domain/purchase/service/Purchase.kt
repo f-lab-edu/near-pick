@@ -4,6 +4,8 @@ import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.InvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidRoleException
 import com.nearpick.app.common.exception.PurchaseStatusInvalidTransitionException
+import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
+import com.nearpick.app.domain.purchase.dto.OrderReceivedResponse
 import com.nearpick.app.domain.purchase.enum.PurchaseStatus
 import com.nearpick.app.domain.product.enum.ProductType
 import com.nearpick.app.domain.product.service.Product
@@ -87,6 +89,18 @@ class Purchase(
                 reservationDt = reservationDt,
                 status = PurchaseStatus.PENDING,
                 requestMessage = message
+            )
+        }
+
+        fun ofOrderReceived(request: CreatePurchaseRequest): OrderReceivedResponse {
+            return OrderReceivedResponse(
+                productId = request.productId,
+                productType = request.productType,
+                totalPrice = request.price.multiply(request.quantity.toBigInteger()),
+                quantity = request.quantity,
+                reservationDt = request.reservationDt,
+                status = PurchaseStatus.PENDING,
+                requestMessage = request.requestMessage
             )
         }
     }

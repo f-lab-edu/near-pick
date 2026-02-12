@@ -59,7 +59,8 @@ class PurchaseResponseMapperTest : StringSpec({
             price = BigInteger("15000"),
             stock = 10,
             productType = ProductType.FIRST_COME,
-            reservationDeadline = null,
+            startDt = null,
+            endDt = null,
             status = null
         )
 

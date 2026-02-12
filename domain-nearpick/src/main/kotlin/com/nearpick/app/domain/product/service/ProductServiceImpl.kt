@@ -90,7 +90,8 @@ open class ProductServiceImpl(
             request.price,
             request.stock,
             request.productType,
-            request.reservationDeadline
+            request.startDt,
+            request.endDt
         )
 
         val updatedEntity = productMapper.toEntity(product)

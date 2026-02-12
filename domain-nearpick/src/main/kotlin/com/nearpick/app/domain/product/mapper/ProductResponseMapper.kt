@@ -17,7 +17,8 @@ class ProductResponseMapper {
             price = product.price,
             stock = product.stock,
             productType = product.productType,
-            reservationDeadline = product.reservationDeadline,
+            startDt = product.startDt,
+            endDt = product.endDt,
             status = product.status
         )
 
@@ -31,7 +32,8 @@ class ProductResponseMapper {
             price = product.price,
             stock = product.stock,
             productType = product.productType,
-            reservationDeadline = product.reservationDeadline,
+            startDt = product.startDt,
+            endDt = product.endDt,
             status = product.status
         )
 }

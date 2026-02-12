@@ -33,7 +33,7 @@ class FirstComePurchaseStrategy(
             val event = PurchaseCreatedEvent(userId, null, request)
             kafkaTemplate.send("first-come-created", event)
 
-            return Purchase.ofOrderReceived(request, product)
+            return Purchase.ofOrderReceived(request)
         } else {
             throw ProductOutOfStockException(request.productId)
         }

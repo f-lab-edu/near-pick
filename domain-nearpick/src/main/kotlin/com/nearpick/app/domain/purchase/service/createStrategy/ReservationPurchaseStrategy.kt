@@ -16,7 +16,7 @@ class ReservationPurchaseStrategy(
 
         //TODO: 예약 기능 추가 예정
 
-        return Purchase.ofOrderReceived(request, product)
+        return Purchase.ofOrderReceived(request)
     }
 }
 
