@@ -1,13 +1,14 @@
 package com.nearpick.app.domain.purchase.controller
 
+import com.nearpick.app.common.response.Response
 import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.InvalidRoleException
-import com.nearpick.app.common.response.Response
 import com.nearpick.app.common.security.principal.UserPrincipal
 import com.nearpick.app.domain.purchase.dto.CreatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.service.PurchaseService
 import com.nearpick.app.domain.purchase.dto.GetPurchaseDetailResponse
+import com.nearpick.app.domain.purchase.dto.OrderReceivedResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -34,7 +35,7 @@ class PurchaseController(
     fun createPurchase(
         @RequestBody request: CreatePurchaseRequest,
         @AuthenticationPrincipal userPrincipal: UserPrincipal
-    ): ResponseEntity<Response<PurchaseResponse>> {
+    ): ResponseEntity<Response<OrderReceivedResponse>> {
         return ResponseEntity.ok(
             Response.success(
                 purchaseService.createPurchase(request, userPrincipal.getUserId())

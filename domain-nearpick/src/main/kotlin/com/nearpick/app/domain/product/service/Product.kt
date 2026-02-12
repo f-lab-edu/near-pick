@@ -15,7 +15,8 @@ class Product(
     var price: BigInteger,
     var stock: Int? = null,
     var productType: ProductType,
-    var reservationDeadline: LocalDateTime? = null,
+    var startDt: LocalDateTime? = null,
+    var endDt: LocalDateTime? = null,
     var status: ProductStatus? = ProductStatus.ACTIVE,
 
     ) {
@@ -25,10 +26,11 @@ class Product(
         price: BigInteger?,
         stock: Int?,
         productType: ProductType?,
-        reservationDeadline: LocalDateTime?
+        startDt: LocalDateTime?,
+        endDt: LocalDateTime?
     ) {
         if (this.status == ProductStatus.ACTIVE &&
-            price != null && stock != null && productType != null && reservationDeadline != null
+            price != null && stock != null && productType != null && startDt != null && endDt != null
         ) {
             throw ProductStatusActiveException(this.id)
         }
@@ -37,10 +39,22 @@ class Product(
         this.price = price ?: this.price
         this.stock = stock ?: this.stock
         this.productType = productType ?: this.productType
-        this.reservationDeadline = reservationDeadline ?: this.reservationDeadline
+        this.startDt = startDt ?: this.startDt
+        this.endDt = endDt ?: this.endDt
     }
 
     fun updateStatus(status: ProductStatus) {
         this.status = status
+    }
+
+    companion object {
+        fun isActiveFirstCome(status: ProductStatus?, startDt: LocalDateTime?, endDt: LocalDateTime?, stock: Int?): Boolean {
+            val allowedStatus = listOf(ProductStatus.ACTIVE, ProductStatus.PENDING)
+
+            return allowedStatus.contains(status)
+                && startDt?.isBefore(LocalDateTime.now()) == true
+                && endDt?.isAfter(LocalDateTime.now()) == true
+                && (stock ?: 0) > 0
+        }
     }
 }

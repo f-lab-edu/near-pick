@@ -45,7 +45,8 @@ open class ProductServiceImpl(
             price = request.price,
             stock = request.stock,
             productType = request.productType,
-            reservationDeadline = request.reservationDeadline
+            startDt = request.startDt,
+            endDt = request.endDt
         )
         val entity = productMapper.toEntity(product)
         productRepository.save(entity)
