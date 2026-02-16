@@ -184,4 +184,10 @@ class InvalidPurchaseException(status: String) : BaseException(
     category = ErrorCategory.VALIDATION
 )
 
+class KafkaPublishFailedException(productId: String) : BaseException(
+    code = "KAFKA_PUBLISH_FAILED",
+    message = "구매 이벤트 발행에 실패했습니다. 재고가 복구되었습니다. (productId=$productId)",
+    category = ErrorCategory.INTERNAL
+)
+
 

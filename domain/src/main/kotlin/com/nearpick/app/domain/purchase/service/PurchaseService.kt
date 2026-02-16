@@ -16,5 +16,5 @@ interface PurchaseService {
     fun findPurchaseDetailBySeller(id: String, userId: String): GetPurchaseDetailResponse
     fun updatePurchase(id: String, userId: String, request: UpdatePurchaseRequest): PurchaseResponse
     fun updatePurchaseStatus(id: String, userId: String, userRole: Role, request: UpdatePurchaseStatusRequest): PurchaseResponse
-    fun applyPurchase(event: CreatePurchaseRequest, userId: String): Boolean
+    fun applyPurchase(eventId: String, event: CreatePurchaseRequest, userId: String): Boolean
 }

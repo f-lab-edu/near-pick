@@ -15,12 +15,15 @@ import com.nearpick.app.domain.purchase.dto.PurchaseResponse
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseRequest
 import com.nearpick.app.domain.purchase.dto.UpdatePurchaseStatusRequest
 import com.nearpick.app.domain.purchase.enum.PurchaseStatus
+import com.nearpick.app.domain.purchase.entity.ProcessedEventEntity
 import com.nearpick.app.domain.purchase.mapper.PurchaseMapper
 import com.nearpick.app.domain.purchase.mapper.PurchaseResponseMapper
+import com.nearpick.app.domain.purchase.repository.ProcessedEventRepository
 import com.nearpick.app.domain.purchase.repository.PurchaseRepository
 import com.nearpick.app.domain.stock.service.StockService
 import com.nearpick.app.domain.user.mapper.UserMapper
 import com.nearpick.app.domain.user.mapper.UserResponseMapper
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -37,8 +40,11 @@ open class PurchaseServiceImpl(
     private val userMapper: UserMapper,
     private val userResponseMapper: UserResponseMapper,
     private val strategyFactory: PurchaseStrategyFactory,
-    private val stockService: StockService
+    private val stockService: StockService,
+    private val processedEventRepository: ProcessedEventRepository
 ) : PurchaseService {
+
+    private val log = LoggerFactory.getLogger(javaClass)
     override fun createPurchase(request: CreatePurchaseRequest, userId: String)
         : OrderReceivedResponse {
         val strategy = strategyFactory.getStrategy(request.productType)
@@ -125,14 +131,19 @@ open class PurchaseServiceImpl(
         return purchaseResponseMapper.toResponse(purchase)
     }
 
-    //TODO: 중복 이벤트 처리(멱등 가드) 필요
-    override fun applyPurchase(event: CreatePurchaseRequest, userId: String): Boolean {
+    override fun applyPurchase(eventId: String, event: CreatePurchaseRequest, userId: String): Boolean {
+        if (processedEventRepository.existsById(eventId)) {
+            log.info("[applyPurchase] 이미 처리된 이벤트 무시. eventId={}", eventId)
+            return true
+        }
+
         val productEntity = productRepository.findById(event.productId)
             .orElseThrow { ProductNotFoundException(event.productId, userId) }
 
         val stock = productEntity.stock ?: 0
         if (stock < event.quantity) {
             handleStockInconsistency(event, userId)
+            processedEventRepository.save(ProcessedEventEntity(eventId))
             return false
         }
 
@@ -153,6 +164,7 @@ open class PurchaseServiceImpl(
         )
         purchaseRepository.save(purchaseMapper.toEntity(purchase))
 
+        processedEventRepository.save(ProcessedEventEntity(eventId))
         return true
     }
 
