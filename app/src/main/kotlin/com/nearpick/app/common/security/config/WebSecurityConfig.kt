@@ -1,5 +1,6 @@
 package com.nearpick.app.common.security.config
 
+import com.nearpick.app.common.ratelimit.RateLimitFilter
 import com.nearpick.app.common.security.JwtAccessDeniedHandler
 import com.nearpick.app.common.security.JwtAuthenticationEntryPoint
 import com.nearpick.app.common.security.JwtAuthenticationFilter
@@ -18,7 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class WebSecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler
+    private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
+    private val rateLimitFilter: RateLimitFilter
 ) {
 
     @Bean
@@ -51,6 +53,7 @@ class WebSecurityConfig(
                 it.accessDeniedHandler(jwtAccessDeniedHandler)
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterAfter(rateLimitFilter, JwtAuthenticationFilter::class.java)
 
         return http.build()
     }
