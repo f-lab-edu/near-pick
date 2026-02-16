@@ -13,4 +13,5 @@ interface StockService {
     fun decreaseStockIfAvailable(productId: String, quantity: Int): Boolean
     fun recoverStock(productId: String, quantity: Int)
     fun reconcileAll(): ReconciliationResult
+    fun isDegradedMode(): Boolean
 }
