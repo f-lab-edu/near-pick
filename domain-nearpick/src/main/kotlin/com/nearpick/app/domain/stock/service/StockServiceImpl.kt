@@ -8,6 +8,7 @@ import com.nearpick.app.domain.product.entity.ProductEntity
 import com.nearpick.app.domain.product.enum.ProductStatus
 import com.nearpick.app.domain.product.enum.ProductType
 import com.nearpick.app.domain.product.repository.ProductRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.stereotype.Service
@@ -22,6 +23,8 @@ open class StockServiceImpl(
     private val productRepository: ProductRepository,
     private val objectMapper: ObjectMapper
 ) : StockService {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional(readOnly = true)
     override fun getStockVersionKey(productId: String): String =
@@ -124,5 +127,64 @@ open class StockServiceImpl(
 
     override fun recoverStock(productId: String, quantity: Int) {
         redisTemplate.opsForValue().increment(getStockVersionKey(productId), quantity.toLong())
+    }
+
+    /**
+     * Redis stock > DB stock 인 경우에만 Redis를 DB 값으로 감소시킨다.
+     * Redis stock <= DB stock 인 경우에는 아무 것도 하지 않는다. (oversell 방지 우선)
+     */
+    private val reconcileScript = DefaultRedisScript<Long>(
+        """
+        local current = tonumber(redis.call('GET', KEYS[1]))
+        if current == nil then
+            return -1
+        end
+        local dbStock = tonumber(ARGV[1])
+        if current > dbStock then
+            redis.call('SET', KEYS[1], ARGV[1])
+            return 1
+        end
+        return 0
+        """.trimIndent(),
+        Long::class.java
+    )
+
+    @Transactional(readOnly = true)
+    override fun reconcileAll(): ReconciliationResult {
+        val products = productRepository.findAllByProductTypeAndStatus(
+            ProductType.FIRST_COME, ProductStatus.ACTIVE
+        )
+
+        var corrected = 0
+
+        for (product in products) {
+            val dbStock = product.stock ?: 0
+            val redisKey = getStockVersionKey(product.id)
+            val redisValueBefore = redisTemplate.opsForValue().get(redisKey)
+
+            val result = redisTemplate.execute(
+                reconcileScript,
+                listOf(redisKey),
+                dbStock.toString()
+            )
+
+            when (result) {
+                1L -> {
+                    log.warn(
+                        "[Reconciliation] 보정 완료. productId={}, redis={}→{}, db={}",
+                        product.id, redisValueBefore, dbStock, dbStock
+                    )
+                    corrected++
+                }
+                -1L -> {
+                    log.info(
+                        "[Reconciliation] Redis 키 없음 (TTL 만료 등). productId={}, skip",
+                        product.id
+                    )
+                }
+            }
+        }
+
+        return ReconciliationResult(checked = products.size, corrected = corrected)
     }
 }

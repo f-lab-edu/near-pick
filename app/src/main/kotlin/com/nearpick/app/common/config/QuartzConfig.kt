@@ -1,6 +1,7 @@
 package com.nearpick.app.common.config
 
 import com.nearpick.app.common.quartz.job.StockJob
+import com.nearpick.app.common.quartz.job.StockReconciliationJob
 import jakarta.annotation.PostConstruct
 import org.quartz.CronScheduleBuilder
 import org.quartz.JobBuilder
@@ -24,9 +25,13 @@ class QuartzConfig(
 
     companion object {
         private const val DAILY_STOCK_JOB_CRON = "0 0 17 * * ?"
+        private const val RECONCILIATION_JOB_CRON = "0 */10 * * * ?"
 
         private const val JOB_KEY_STOCK = "dailyStockJob"
         private const val TRIGGER_KEY_STOCK = "dailyStockTrigger"
+
+        private const val JOB_KEY_RECONCILIATION = "stockReconciliationJob"
+        private const val TRIGGER_KEY_RECONCILIATION = "stockReconciliationTrigger"
 
         private const val SCHEDULER_NAME = "NearPickQuartzScheduler"
     }
@@ -39,12 +44,30 @@ class QuartzConfig(
             .build()
 
     @Bean
-    fun stockTrigger(jobDetail: JobDetail): Trigger =
+    fun stockTrigger(@Qualifier("stockJobDetail") jobDetail: JobDetail): Trigger =
         TriggerBuilder.newTrigger()
             .forJob(jobDetail)
             .withIdentity(TRIGGER_KEY_STOCK)
             .withSchedule(
                 CronScheduleBuilder.cronSchedule(DAILY_STOCK_JOB_CRON)
+                    .withMisfireHandlingInstructionFireAndProceed()
+            )
+            .build()
+
+    @Bean
+    fun reconciliationJobDetail(): JobDetail =
+        JobBuilder.newJob(StockReconciliationJob::class.java)
+            .withIdentity(JOB_KEY_RECONCILIATION)
+            .storeDurably()
+            .build()
+
+    @Bean
+    fun reconciliationTrigger(@Qualifier("reconciliationJobDetail") jobDetail: JobDetail): Trigger =
+        TriggerBuilder.newTrigger()
+            .forJob(jobDetail)
+            .withIdentity(TRIGGER_KEY_RECONCILIATION)
+            .withSchedule(
+                CronScheduleBuilder.cronSchedule(RECONCILIATION_JOB_CRON)
                     .withMisfireHandlingInstructionFireAndProceed()
             )
             .build()
@@ -81,7 +104,9 @@ class QuartzConfig(
     fun schedulerInitializer(
         schedulerFactoryBean: SchedulerFactoryBean,
         stockJobDetail: JobDetail,
-        stockTrigger: Trigger
+        stockTrigger: Trigger,
+        reconciliationJobDetail: JobDetail,
+        reconciliationTrigger: Trigger
     ): Any {
         return object {
             @PostConstruct
@@ -90,6 +115,10 @@ class QuartzConfig(
 
                 if (!scheduler.checkExists(stockJobDetail.key)) {
                     scheduler.scheduleJob(stockJobDetail, stockTrigger)
+                }
+
+                if (!scheduler.checkExists(reconciliationJobDetail.key)) {
+                    scheduler.scheduleJob(reconciliationJobDetail, reconciliationTrigger)
                 }
 
                 if (!scheduler.isStarted) {
