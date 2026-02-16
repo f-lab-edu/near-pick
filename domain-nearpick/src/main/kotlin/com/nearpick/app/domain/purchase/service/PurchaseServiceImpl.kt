@@ -4,7 +4,6 @@ import com.nearpick.app.common.constant.Role
 import com.nearpick.app.common.exception.InvalidRoleException
 import com.nearpick.app.common.exception.PurchaseNotFoundException
 import com.nearpick.app.common.exception.ProductNotFoundException
-import com.nearpick.app.domain.product.enum.ProductStatus
 import com.nearpick.app.domain.product.mapper.ProductMapper
 import com.nearpick.app.domain.product.mapper.ProductResponseMapper
 import com.nearpick.app.domain.product.repository.ProductRepository
@@ -137,21 +136,19 @@ open class PurchaseServiceImpl(
             return true
         }
 
-        val productEntity = productRepository.findById(event.productId)
-            .orElseThrow { ProductNotFoundException(event.productId, userId) }
+        val updatedRows = productRepository.decreaseStock(event.productId, event.quantity)
 
-        val stock = productEntity.stock ?: 0
-        if (stock < event.quantity) {
+        if (updatedRows == 0) {
+            if (!productRepository.existsById(event.productId)) {
+                throw ProductNotFoundException(event.productId, userId)
+            }
+            log.warn("[applyPurchase] 재고 부족. productId={}, quantity={}", event.productId, event.quantity)
             handleStockInconsistency(event, userId)
             processedEventRepository.save(ProcessedEventEntity(eventId))
             return false
         }
 
-        productEntity.stock = stock - event.quantity
-        if (stock == event.quantity) {
-            productEntity.status = ProductStatus.INACTIVE_SOLD_OUT
-        }
-        productRepository.save(productEntity)
+        productRepository.markSoldOutIfEmpty(event.productId)
 
         val purchase = Purchase.create(
             userId = userId,
@@ -165,6 +162,7 @@ open class PurchaseServiceImpl(
         purchaseRepository.save(purchaseMapper.toEntity(purchase))
 
         processedEventRepository.save(ProcessedEventEntity(eventId))
+        log.info("[applyPurchase] 구매 처리 완료. eventId={}, productId={}", eventId, event.productId)
         return true
     }
 
