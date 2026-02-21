@@ -17,7 +17,7 @@ class Product(
     var productType: ProductType,
     var startDt: LocalDateTime? = null,
     var endDt: LocalDateTime? = null,
-    var status: ProductStatus? = ProductStatus.ACTIVE,
+    var status: ProductStatus? = ProductStatus.PENDING,
 
     ) {
     fun update(

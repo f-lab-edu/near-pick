@@ -6,6 +6,7 @@ import com.nearpick.app.common.exception.ProductReservationExistsException
 import com.nearpick.app.domain.brand.mapper.BrandMapper
 import com.nearpick.app.domain.brand.mapper.BrandResponseMapper
 import com.nearpick.app.domain.brand.repository.BrandRepository
+import com.nearpick.app.domain.policy.event.PolicyReviewRequestedEvent
 import com.nearpick.app.domain.product.dto.CreateProductRequest
 import com.nearpick.app.domain.product.dto.GetProductDetailResponse
 import com.nearpick.app.domain.product.dto.ProductResponse
@@ -17,6 +18,8 @@ import com.nearpick.app.domain.product.repository.ProductRepository
 import com.nearpick.app.domain.purchase.repository.PurchaseRepository
 import com.nearpick.app.domain.user.mapper.UserMapper
 import com.nearpick.app.domain.user.mapper.UserResponseMapper
+import org.slf4j.LoggerFactory
+import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 
@@ -31,8 +34,11 @@ open class ProductServiceImpl(
     private val brandMapper: BrandMapper,
     private val brandResponseMapper: BrandResponseMapper,
     private val userMapper: UserMapper,
-    private val userResponseMapper: UserResponseMapper
+    private val userResponseMapper: UserResponseMapper,
+    private val kafkaTemplate: KafkaTemplate<String, PolicyReviewRequestedEvent>
 ) : ProductService {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     override fun createProduct(request: CreateProductRequest, userId: String): ProductResponse {
         if (!brandRepository.existsById(request.brandId)) throw BrandNotFoundException(request.brandId, userId)
@@ -50,6 +56,20 @@ open class ProductServiceImpl(
         )
         val entity = productMapper.toEntity(product)
         productRepository.save(entity)
+
+        runCatching {
+            val reviewEvent = PolicyReviewRequestedEvent(
+                productId = entity.id,
+                name = request.name,
+                description = request.description,
+                category = request.brandId,
+                ocrText = request.ocrText,
+                imageHints = request.imageHints
+            )
+            kafkaTemplate.send("product-policy-review", reviewEvent)
+        }.onFailure { e ->
+            log.warn("[PolicyReview] 심사 이벤트 발행 실패 (상품은 PENDING 유지). productId={}, error={}", entity.id, e.message)
+        }
 
         return productResponseMapper.toResponse(product)
     }

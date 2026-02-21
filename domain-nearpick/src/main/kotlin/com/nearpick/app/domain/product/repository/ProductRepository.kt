@@ -20,4 +20,8 @@ interface ProductRepository : JpaRepository<ProductEntity, String> {
     @Modifying
     @Query("UPDATE ProductEntity p SET p.status = 'INACTIVE_SOLD_OUT' WHERE p.id = :productId AND p.stock = 0")
     fun markSoldOutIfEmpty(@Param("productId") productId: String): Int
+
+    @Modifying
+    @Query("UPDATE ProductEntity p SET p.status = :status WHERE p.id = :productId")
+    fun updateStatusById(@Param("productId") productId: String, @Param("status") status: ProductStatus): Int
 }

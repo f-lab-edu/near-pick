@@ -13,5 +13,7 @@ data class CreateProductRequest(
     val productType: ProductType,
     val startDt: LocalDateTime? = null,
     val endDt: LocalDateTime? = null,
-    val isActive: Boolean? = true
+    val isActive: Boolean? = true,
+    val ocrText: String? = null,
+    val imageHints: List<String>? = null
 )

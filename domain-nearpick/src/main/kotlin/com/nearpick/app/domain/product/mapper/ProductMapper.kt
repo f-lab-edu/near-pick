@@ -29,7 +29,7 @@ class ProductMapper(
             productType = product.productType,
             startDt = product.startDt,
             endDt = product.endDt,
-            status = product.status ?: ProductStatus.ACTIVE
+            status = product.status ?: ProductStatus.PENDING
         )
     }
 
